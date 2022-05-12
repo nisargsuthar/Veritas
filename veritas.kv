@@ -1,0 +1,35 @@
+<MainApp>
+	GridLayout:
+		cols: 1
+		size: root.width, root.height
+		GridLayout:
+			cols: 1
+			Label:
+				id: choosetemplate
+				text: "Choose Template"
+		GridLayout:
+			cols: 3
+			GridLayout:
+				cols: 1
+				Label:
+					id: hex
+					text: "Hex"
+					font_size: 16
+					font_name: "RobotoMono-Regular"
+					markup: True
+			GridLayout:
+				cols: 1
+				Label:
+					id: ascii
+					text: "ASCII"
+					font_size: 16
+					font_name: "RobotoMono-Regular"
+					markup: True
+			GridLayout:
+				cols: 1
+				Label:
+					text: "Color markers"
+		Button:
+			text: "Open File"
+			font_size: 32
+			on_release: root.openFile()
