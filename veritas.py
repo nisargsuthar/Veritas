@@ -2,7 +2,7 @@ from kivy.config import Config
 Config.set('graphics', 'window_state', 'maximized')
 
 from colors import *
-from checkTemplate import *
+from loadtemp import *
 import binascii
 import kivy
 from kivy.app import App
@@ -52,7 +52,7 @@ class MainApp(Widget):
 			print(data)
 			return data
 
-		with open('test.txt', 'rb') as f:
+		with open('decomp.pf', 'rb') as f:
 			for byte in iter(lambda: f.read(1), b''):
 				bytecount += 1
 				asciichar = int.from_bytes(byte, "big")
@@ -68,9 +68,9 @@ class MainApp(Widget):
 					hexdata += "\n"
 					asciidata += "\n"
 
-		if not checkTemp():
+		if not tempLoader():
 			print("Artifact not found in the current database!")
-			#TODO: Add kivy popup.
+			# TODO: Add kivy popup.
 			
 		hexdata = colorBytes(0, hexdata, c["red"], 6, 32)
 		asciidata = colorBytes(1, asciidata, c["red"], 6, 32)
