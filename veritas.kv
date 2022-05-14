@@ -1,34 +1,32 @@
+<Label>:
+    text_size: self.width, None
+    height: self.texture_size[1]
+    size_hint_y: None
+    font_size: 16
+    font_name: "RobotoMono-Regular"
+    markup: True
+
 <MainApp>
-	GridLayout:
-		rows: 1
-		size: root.width, root.height
-		#GridLayout:
-		#	cols: 1
-		#	Label:
-		#		id: choosetemplate
-		#		text: "Choose Template"
-		GridLayout:
-			cols: 1
-			Label:
-				id: hex
-				text: "Hex"
-				font_size: 16
-				font_name: "RobotoMono-Regular"
-				markup: True
-		GridLayout:
-			cols: 1
-			Label:
-				id: ascii
-				text: "ASCII"
-				font_size: 16
-				font_name: "RobotoMono-Regular"
-				markup: True
-		#GridLayout:
-		#	cols: 1
-		#	Label:
-		#		text: "Color markers"
-		Button:
-			text: "Open File"
-			font_size: 16
-    		size_hint: 0.2, 0.2
-			on_release: root.openFile()
+    ScrollView:
+        size_hint: (1, None)
+        size: root.width, root.height
+        do_scroll_y: True
+        do_scroll_x: False
+        bar_width: 15
+        effect_cls: "ScrollEffect"
+        scroll_type: ["bars"]
+        GridLayout:
+            cols: 4
+            height: self.minimum_height
+            size_hint_y: None
+            Label:
+                id: hex
+                text: "Hex" 
+            Label:
+                id: ascii
+                text: "ASCII"
+    Button:
+        id: openfile
+        text: "Open Artifact"
+        font_size: 16
+        on_release: root.openFile()
