@@ -22,5 +22,5 @@ def colorBytes(view, data, col, pos, howmany):
 		for seek in range(howmany):
 			pos += 1
 		data = data[:pos] + cc + data[pos:]
-	# print(data)
+	print(data)
 	return data
