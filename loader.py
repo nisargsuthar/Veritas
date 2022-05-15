@@ -12,7 +12,7 @@ def tempLoader():
 	hexdata = ""
 	asciidata = ""
 	bytecount = 0	
-	with open('test.txt', 'rb') as f:
+	with open('decomp.pf', 'rb') as f:
 		for byte in iter(lambda: f.read(1), b''):
 			hexbytes.append(binascii.hexlify(byte).decode("utf-8"))
 			bytecount += 1
@@ -64,6 +64,7 @@ def tempLoader():
 	# elif isMFT():
 	# elif isRegistry():
 	else:
+		# ~~~TEMPORARY SPAGHETTI CODE~~~
 		pairlist = ["NOT", "FOUND"]
 
 	return True, hexdata, asciidata, pairlist if isPrefetch() or isMFT() or isRegistry() else False, hexdata, asciidata, pairlist
