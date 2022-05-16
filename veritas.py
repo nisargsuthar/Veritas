@@ -1,14 +1,11 @@
 from kivy.config import Config
 Config.set('graphics', 'window_state', 'maximized')
-
 from loader import *
 from primer import *
 import binascii
 import kivy
 from kivy.app import App
 from kivy.uix.widget import Widget
-from kivy.utils import escape_markup
-
 ######################################################################################
 	# TODO: #
 	#########
@@ -27,20 +24,25 @@ class MainApp(Widget):
 		else:
 			hexdata = temp[1]
 			asciidata = temp[2]
-			asciidata = escape_markup(asciidata)
-			pairlist = temp[3]
-			# print("PAIRLIST: ", pairlist)
+			markerdata = temp[3]
+			pairlist = temp[4]
+			asciidata = escapeMarkup(asciidata)
+			newmarkerdata = []
 
 			for color in c:
 				for pair in reversed(pairlist):
-					hexdata = colorBytes(0, hexdata, c[color], pair[0], pair[1])
-					asciidata = colorBytes(1, asciidata, c[color], pair[0], pair[1])
+					hexdata = colorBytes(hexdata, c[color], pair[0] - 1, pair[1] + 1)
+					asciidata = colorBytes(asciidata, c[color], pair[0] - 1, pair[1] + 1)
+					# markerlist.append(pairlist[-1])
 					del pairlist[-1]
 					break
 
-			self.ids.hex.text = hexdata
-			self.ids.ascii.text =  asciidata.replace(" ", "")
-			self.remove_widget(self.ids.openfile)		
+			print(newmarkerdata)
+
+			self.ids.hex.text = listToString(hexdata)
+			self.ids.ascii.text = listToString(asciidata)
+			self.ids.markers.text = listToString(newmarkerdata)
+			self.remove_widget(self.ids.openfile)
 
 class Veritas(App):
 	def build(self):
