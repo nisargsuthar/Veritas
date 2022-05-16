@@ -6,9 +6,19 @@ from offsetter import *
 	#########
 	# SECTION C, D, E & F
 
-def prefetch():
+def prefetchMarkers():
+	prefetchmarkers = []
+	prefetchmarkers.append("@ FILE HEADER\n")
+	prefetchmarkers.append("@ FILE INFORMATION\n")
+	prefetchmarkers.append("@ FILE METRICS\n")
+	prefetchmarkers.append("@ TRACE CHAINS ARRAY\n")
+
+	print(prefetchmarkers)
+	return prefetchmarkers
+
+def prefetchTemplate():
 	prefetchbytes = []
-	prefetchfinal = []
+	prefetchtemp = []
 	prefetchsizes = []
 	with open('decomp.pf', 'rb') as f:
 		for byte in iter(lambda: f.read(1), b''):
@@ -68,14 +78,14 @@ def prefetch():
 			tracechains = [[1, 4], [5, 1], [6, 1], [7, 2]]
 			tracechainssize = 8
 
-	prefetchfinal.append(fileheader)
-	prefetchfinal.append(fileinfo)
-	prefetchfinal.append(filemetrics)
-	prefetchfinal.append(tracechains)
+	prefetchtemp.append(fileheader)
+	prefetchtemp.append(fileinfo)
+	prefetchtemp.append(filemetrics)
+	prefetchtemp.append(tracechains)
 	
 	prefetchsizes.append(fileheadersize)
 	prefetchsizes.append(fileinfosize)
 	prefetchsizes.append(filemetricssize)
 	prefetchsizes.append(tracechainssize)
 
-	return toAbsolute(prefetchfinal, prefetchsizes)
+	return toAbsolute(prefetchtemp, prefetchsizes)

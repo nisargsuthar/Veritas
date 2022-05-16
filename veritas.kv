@@ -2,7 +2,7 @@
     text_size: self.width, None
     height: self.texture_size[1]
     size_hint_y: None
-    font_size: 16
+    font_size: 20
     font_name: "RobotoMono-Regular"
     markup: True
 
@@ -16,7 +16,7 @@
         effect_cls: "ScrollEffect"
         scroll_type: ["bars"]
         GridLayout:
-            cols: 4
+            cols: 3
             height: self.minimum_height
             size_hint_y: None
             Label:
@@ -25,6 +25,9 @@
             Label:
                 id: ascii
                 text: "ASCII"
+            Label:
+                id: markers
+                text: "Markers"
     Button:
         id: openfile
         text: "Open Artifact"
