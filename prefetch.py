@@ -8,12 +8,14 @@ from offsetter import *
 
 def prefetchMarkers():
 	prefetchmarkers = []
-	prefetchmarkers.append("@ FILE HEADER\n")
-	prefetchmarkers.append("@ FILE INFORMATION\n")
-	prefetchmarkers.append("@ FILE METRICS\n")
-	prefetchmarkers.append("@ TRACE CHAINS ARRAY\n")
+	prefetchmarkers.append("\n+4  Format version    \n17 > Windows XP, Windows 2003    \n23 > Windows Vista, Windows 7    \n26 > Windows 8.1    \n30 > Windows 10\n")
+	prefetchmarkers.append("\n+4  Signature\n")
+	prefetchmarkers.append("\n+4  Unknown\nSeen: 0x0000000f, 0x00000011 \n")
+	prefetchmarkers.append("\n+4  File size\n")
+	prefetchmarkers.append("\n+60 Executable filename\nUTF-16 little-endian string with end-of-string character\n")
+	prefetchmarkers.append("\n+4 Prefetch hash\nThis value should correspond with the hash in the Prefetch filename\n")
+	prefetchmarkers.append("\n+4 Unknown (flags?)\n0x01 > is boot prefetch\n(Seen in: NTOSBOOT-B00DFAAD.pf, Op-EXPLORER.EXE-A80E4F97-000000F5.pf)\n")
 
-	print(prefetchmarkers)
 	return prefetchmarkers
 
 def prefetchTemplate():

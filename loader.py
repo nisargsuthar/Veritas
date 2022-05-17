@@ -10,7 +10,7 @@ def tempLoader():
 	hexdata = []
 	asciidata = []
 	markerlist = []
-	pairlist = []
+	templist = []
 	bytecount = 0
 	with open('decomp.pf', 'rb') as f:
 		for byte in iter(lambda: f.read(1), b''):
@@ -61,12 +61,12 @@ def tempLoader():
 		return False
 
 	if isPrefetch():
-		pairlist = prefetchTemplate()
+		templist = prefetchTemplate()
 		markerdata = prefetchMarkers()
 	# elif isMFT():
 	# elif isRegistry():
 	else:
 		# ~~~TEMPORARY SPAGHETTI CODE~~~
-		pairlist = ["NOT", "FOUND"]
+		templist = ["NOT", "FOUND"]
 
-	return True, hexdata, asciidata, markerdata, pairlist if isPrefetch() or isMFT() or isRegistry() else False, hexdata, asciidata, markerdata, pairlist
+	return True, hexdata, asciidata, markerdata, templist if isPrefetch() or isMFT() or isRegistry() else False, hexdata, asciidata, markerdata, templist
