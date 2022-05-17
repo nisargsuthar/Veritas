@@ -17,31 +17,39 @@ from kivy.uix.widget import Widget
 
 class MainApp(Widget):
 	def openFile(self):
-		temp = tempLoader()
-		if not temp[0]:
+		loader = tempLoader()
+		if not loader[0]:
 			print("Artifact not found in the current database!")
 			# TODO: Add kivy popup.
 		else:
-			hexdata = temp[1]
-			asciidata = temp[2]
-			markerdata = temp[3]
-			pairlist = temp[4]
+			hexdata = loader[1]
+			asciidata = loader[2]
+			markerdata = loader[3]
+			markerdatasize = len(markerdata)
+			templist = loader[4]
+
 			asciidata = escapeMarkup(asciidata)
-			newmarkerdata = []
+			savecolor = []
 
 			for color in c:
-				for pair in reversed(pairlist):
+				for pair in reversed(templist):
 					hexdata = colorBytes(hexdata, c[color], pair[0] - 1, pair[1] + 1)
 					asciidata = colorBytes(asciidata, c[color], pair[0] - 1, pair[1] + 1)
-					# markerlist.append(pairlist[-1])
-					del pairlist[-1]
+					savecolor.append(color)
+					del templist[-1]
 					break
-
-			print(newmarkerdata)
+			
+			savecolor = reversed(savecolor)
+			i = 0
+			for color in savecolor:
+				while i < (markerdatasize-1)*3+2:
+					markerdata = colorBytes(markerdata, c[color], i, 2)
+					i += 3
+					break
 
 			self.ids.hex.text = listToString(hexdata)
 			self.ids.ascii.text = listToString(asciidata)
-			self.ids.markers.text = listToString(newmarkerdata)
+			self.ids.markers.text = listToString(markerdata)
 			self.remove_widget(self.ids.openfile)
 
 class Veritas(App):
