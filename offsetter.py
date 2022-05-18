@@ -13,3 +13,8 @@ def toAbsolute(listofpairlist, listofsizes):
 		returnlist += listofpairlist[l]
 	
 	return returnlist
+
+def swapEndianness(hexstring):
+	ba = bytearray.fromhex(hexstring)
+	ba.reverse()
+	return ba.hex()
