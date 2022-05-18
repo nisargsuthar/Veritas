@@ -14,7 +14,6 @@ from kivy.uix.widget import Widget
 	# Implement FileChooser.
 	# Replace ScrollView with RecycleView.
 	# Implement Tabs.
-
 class MainApp(Widget):
 	def openFile(self):
 		loader = tempLoader()
@@ -46,7 +45,7 @@ class MainApp(Widget):
 					markerdata = colorBytes(markerdata, c[color], i, 2)
 					i += 3
 					break
-
+			hexdata = [s + " " if len(s) == 2 else s for s in hexdata]
 			self.ids.hex.text = listToString(hexdata)
 			self.ids.ascii.text = listToString(asciidata)
 			self.ids.markers.text = listToString(markerdata)
