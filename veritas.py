@@ -6,7 +6,7 @@ import binascii
 import kivy
 from kivy.app import App
 from kivy.uix.widget import Widget
-######################################################################################
+###############################################################################
 	# TODO: #
 	#########
 	# Decode for extended ASCII set.
@@ -45,7 +45,7 @@ class MainApp(Widget):
 					markerdata = colorBytes(markerdata, c[color], i, 2)
 					i += 3
 					break
-			hexdata = [s + " " if len(s) == 2 else s for s in hexdata]
+			hexdata = [s.upper()+" " if len(s) == 2 else s for s in hexdata]
 			self.ids.hex.text = listToString(hexdata)
 			self.ids.ascii.text = listToString(asciidata)
 			self.ids.markers.text = listToString(markerdata)
