@@ -30,19 +30,17 @@ def tempLoader():
 					asciidata.append(".")
 ######################################################################################
 	def isPrefetch():
-		def isCompressed():
-			magic = "".join(hexdata[b] for b in range(3)).upper()
-			if magic == "4D414D": # MAM
-				print("Prefetch file is compressed!")
+		magic = "".join(hexdata[b] for b in range(3)).upper()
+		if magic == "4D414D": # MAM
+			print("Prefetch file is compressed!")
+			return True
+			# IMPLEMENT KIVY POPUP TO ALERT ABOUT COMPRESSION.
+		else:
+			magic = "".join(hexdata[b] for b in range(4, 8)).upper()
+			if magic == "53434341": # SCCA
+				print("Prefetch file is not compressed!")
 				return True
-				# IMPLEMENT KIVY POPUP TO ALERT ABOUT COMPRESSION.
-			else:
-				magic = "".join(hexdata[b] for b in range(4, 8)).upper()
-				if magic == "53434341": # SCCA
-					print("Prefetch file is not compressed!")
-					return True
-				return False
-		return isCompressed()
+			return False
 ######################################################################################
 	def isMFT():
 		magic = "".join(hexdata[b] for b in range(4)).upper()
@@ -60,13 +58,17 @@ def tempLoader():
 			return True
 		return False
 
-	if isPrefetch():
+	isprefetch = isPrefetch()
+	# ismft = isMFT()
+	# isregistry = isRegistry()
+
+	if isprefetch:
 		templist = prefetchTemplate()
 		markerdata = prefetchMarkers()
-	# elif isMFT():
-	# elif isRegistry():
+	# elif ismft:
+	# elif isregistry:
 	else:
 		# ~~~TEMPORARY SPAGHETTI CODE~~~
 		templist = ["NOT", "FOUND"]
 
-	return True, hexdata, asciidata, markerdata, templist if isPrefetch() or isMFT() or isRegistry() else False, hexdata, asciidata, markerdata, templist
+	return True, hexdata, asciidata, markerdata, templist if isprefetch or ismft or isregistry else False, hexdata, asciidata, markerdata, templist

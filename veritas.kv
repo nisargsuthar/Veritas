@@ -1,33 +1,55 @@
-<Label>:
+<MyLabel@Label>:
     text_size: self.width, None
-    height: self.texture_size[1]
     size_hint_y: None
+    height: self.texture_size[1]
+    size_hint_x: None
     font_size: 20
     font_name: "RobotoMono-Regular"
     markup: True
 
 <MainApp>
-    ScrollView:
-        size_hint: (1, None)
+    GridLayout:
+        cols: 2
         size: root.width, root.height
-        do_scroll_y: True
-        do_scroll_x: False
-        bar_width: 15
-        effect_cls: "ScrollEffect"
-        scroll_type: ["bars"]
-        GridLayout:
-            cols: 3
-            height: self.minimum_height
-            size_hint_y: None
-            Label:
-                id: hex
-                text: "Hex" 
-            Label:
-                id: ascii
-                text: "ASCII"
-            Label:
+        ScrollView:
+            size_hint_x: None
+            width: hex.width + ascii.width  
+
+            do_scroll: False, True
+            bar_width: 15
+            effect_cls: "ScrollEffect"
+            scroll_type: ["bars"]
+
+            GridLayout:
+                cols: 2
+                height: self.minimum_height
+                size_hint_y: None
+
+                MyLabel:
+                    id: hex
+                    text: "Hex"
+                    width: 564+20+20
+                    padding: 20, 20
+
+                MyLabel:
+                    id: ascii
+                    text: "ASCII"
+                    width: 192+20+20
+                    padding: 20, 20
+
+        ScrollView:
+            do_scroll: False, True
+            bar_width: 15
+            effect_cls: "ScrollEffect"
+            scroll_type: ["bars"]
+
+            MyLabel:
                 id: markers
                 text: "Markers"
+                bold: True
+                width: root.width-hex.width-ascii.width
+                padding: 20, 20
+
     Button:
         id: openfile
         text: "Open Artifact"
