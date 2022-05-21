@@ -53,33 +53,10 @@ class MyWidget(Widget):
 			asciidata = listToString(asciidata)
 			markerdata = listToString(markerdata)
 
-			bi = 0
-			colors = {}
-			removeEndIndices = []
-			while bi < len(hexdata):
-				currentByte = hexdata[bi:bi+2]
-				if " " in currentByte:
-					bi += 1
-					continue
-				elif "\n" in currentByte:
-					bi += 1
-					if hexdata[bi:bi+2] == "[/":
-						removeEndIndices.append(bi)
-					else:
-						colors.update({bi: lastColor})
-				match currentByte:
-					case "[c":
-						lastColor = hexdata[bi+7:bi+7+6]
-						bi += 14
-					case "[/":
-						bi += 6
-						lastColor = ""
-				bi += 2
-			colors = {key:val for key, val in colors.items() if val != ""}
-			for key, val in reversed(colors.items()):
-				hexdata = hexdata[:key] + "[color={}]".format(val) + hexdata[key:]
-			hexdata = hexdata.replace("\n[/color]", "\n")
+			hexdata = fixHex(hexdata)
+			asciidata = fixAscii(asciidata)
 			# print(hexdata)
+			# print(asciidata)
 
 			def joinHexAscii(hexd, asciid):
 				return {"hextext": hexd, "asciitext": asciid}

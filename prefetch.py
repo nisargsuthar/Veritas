@@ -11,7 +11,7 @@ def prefetchTemplate():
 	prefetchtemp = []
 	prefetchsizes = []
 	prefetchmarkers = []
-	with open('kape.pf', 'rb') as f:
+	with open('decomp.pf', 'rb') as f:
 		for byte in iter(lambda: f.read(1), b''):
 			prefetchbytes.append(binascii.hexlify(byte).decode("utf-8"))
 ######################################################################

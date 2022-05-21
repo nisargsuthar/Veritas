@@ -12,7 +12,7 @@ def tempLoader():
 	markerlist = []
 	templist = []
 	bytecount = 0
-	with open('kape.pf', 'rb') as f:
+	with open('decomp.pf', 'rb') as f:
 		for byte in iter(lambda: f.read(1), b''):
 			bytecount += 1
 			asciichar = int.from_bytes(byte, "big")
