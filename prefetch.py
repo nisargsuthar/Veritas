@@ -1,7 +1,7 @@
 import binascii
 from offsetter import *
 
-######################################################################################
+######################################################################
 	# TODO: #
 	#########
 	# Write logic for marking dynamic data from template points.
@@ -11,10 +11,10 @@ def prefetchTemplate():
 	prefetchtemp = []
 	prefetchsizes = []
 	prefetchmarkers = []
-	with open('decomp.pf', 'rb') as f:
+	with open('kape.pf', 'rb') as f:
 		for byte in iter(lambda: f.read(1), b''):
 			prefetchbytes.append(binascii.hexlify(byte).decode("utf-8"))
-######################################################################################
+######################################################################
 	# COMMON SECTION. #
 	###################
 	fileheader = [[1, 4], [5, 4], [9, 4], [13, 4], [17, 60], [77, 4], [81, 4]]
@@ -62,7 +62,7 @@ def prefetchTemplate():
 	sharedTraceChainsByVer172326.append("\nUnknown (Sample duration in ms?)\nSeen: 0x01\n")
 	sharedTraceChainsByVer172326.append("\nUnknown\nSeen: 0x0001, 0xFFFF\n")
 
-######################################################################################
+######################################################################
 	# VERSION SPECIFIC. #
 	#####################
 	version = "".join(prefetchbytes[b] for b in range(4)).upper()
@@ -154,6 +154,7 @@ def prefetchTemplate():
 			prefetchmarkers.append("\nUnknown (Sample duration in ms?)\nSeen: 0x01\n")
 			prefetchmarkers.append("\nUnknown\nSeen: 0x0001, 0xFFFF\n")
 
+	# prefetchmarkers.append("\nFile name strings\n")
 	prefetchtemp.append(fileheader)
 	prefetchtemp.append(fileinfo)
 	prefetchtemp.append(filemetrics)
@@ -164,4 +165,14 @@ def prefetchTemplate():
 	prefetchsizes.append(filemetricssize)
 	prefetchsizes.append(tracechainssize)
 
-	return toAbsolute(prefetchtemp, prefetchsizes), prefetchmarkers
+	absolute = toAbsolute(prefetchtemp, prefetchsizes)
+	# print(absolute)
+	filenamestringsoffset = "".join(prefetchbytes[b] for b in range(100, 104)).upper()
+	filenamestringssize = "".join(prefetchbytes[b] for b in range(104, 108)).upper()
+
+	filenamestringsoffset = int(swapEndianness(filenamestringsoffset), 16)
+	filenamestringssize = int(swapEndianness(filenamestringssize), 16)
+	# print(filenamestringsoffset, filenamestringssize)
+	# absolute.append([filenamestringsoffset, filenamestringssize])
+
+	return absolute, prefetchmarkers
