@@ -6,16 +6,21 @@ import binascii
 import kivy
 from kivy.app import App
 from kivy.uix.widget import Widget
-###############################################################################
+from kivy.properties import StringProperty, ListProperty, ObjectProperty
+#######################################################################
 	# TODO: #
 	#########
 	# Decode for extended ASCII set.
 	# Add a HEX calculator.
 	# Implement FileChooser.
-	# Replace ScrollView with RecycleView.
 	# Implement Tabs.
-class MainApp(Widget):
+class MyWidget(Widget):
+	firstrv = ObjectProperty(None)
+	secondrv = ObjectProperty(None)
+
 	def openFile(self):
+		app = App.get_running_app()
+
 		loader = tempLoader()
 		if not loader[0]:
 			print("Artifact not found in the current database!")
@@ -26,10 +31,8 @@ class MainApp(Widget):
 			markerdata = loader[3]
 			markerdatasize = len(markerdata)
 			templist = loader[4]
-
 			asciidata = escapeMarkup(asciidata)
 			savecolor = []
-
 			for color in c:
 				for pair in reversed(templist):
 					hexdata = colorBytes(hexdata, c[color], pair[0] - 1, pair[1] + 1)
@@ -37,7 +40,6 @@ class MainApp(Widget):
 					savecolor.append(color)
 					del templist[-1]
 					break
-			
 			savecolor = reversed(savecolor)
 			i = 0
 			for color in savecolor:
@@ -46,14 +48,57 @@ class MainApp(Widget):
 					i += 3
 					break
 			hexdata = [s.upper()+" " if len(s) == 2 else s for s in hexdata]
-			self.ids.hex.text = listToString(hexdata)
-			self.ids.ascii.text = listToString(asciidata)
-			self.ids.markers.text = listToString(markerdata)
+
+			hexdata = listToString(hexdata)
+			asciidata = listToString(asciidata)
+			markerdata = listToString(markerdata)
+
+			bi = 0
+			colors = {}
+			removeEndIndices = []
+			while bi < len(hexdata):
+				currentByte = hexdata[bi:bi+2]
+				if " " in currentByte:
+					bi += 1
+					continue
+				elif "\n" in currentByte:
+					bi += 1
+					if hexdata[bi:bi+2] == "[/":
+						removeEndIndices.append(bi)
+					else:
+						colors.update({bi: lastColor})
+				match currentByte:
+					case "[c":
+						lastColor = hexdata[bi+7:bi+7+6]
+						bi += 14
+					case "[/":
+						bi += 6
+						lastColor = ""
+				bi += 2
+			colors = {key:val for key, val in colors.items() if val != ""}
+			for key, val in reversed(colors.items()):
+				hexdata = hexdata[:key] + "[color={}]".format(val) + hexdata[key:]
+			hexdata = hexdata.replace("\n[/color]", "\n")
+			# print(hexdata)
+
+			def joinHexAscii(hexd, asciid):
+				return {"hextext": hexd, "asciitext": asciid}
+			
+			finaltuple = []
+			for h, a in zip(hexdata.split("\n"), asciidata.split("\n")):
+				finaltuple.append(joinHexAscii(h, a))
+			first = finaltuple
+			# print(first)
+			second = [{"text": "{}".format(line)} for line in markerdata.split("\t")]
+			# print(second)
+
+			self.ids.firstrv.data = first
+			self.ids.secondrv.data = second
 			self.remove_widget(self.ids.openfile)
 
 class Veritas(App):
 	def build(self):
-		return MainApp()
+		return MyWidget()
 
 if __name__ == '__main__':
 	Veritas().run()

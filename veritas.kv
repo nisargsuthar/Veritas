@@ -1,4 +1,4 @@
-<MyLabel@Label>:
+<HexAsciiLabel@Label>:
     text_size: self.width, None
     size_hint_y: None
     height: self.texture_size[1]
@@ -6,50 +6,69 @@
     font_size: 20
     font_name: "RobotoMono-Regular"
     markup: True
+    padding: 20, 5
 
-<MainApp>
+<MarkerLabel@Label>:
+    text_size: self.width, None
+    size_hint_y: None
+    height: self.texture_size[1]
+    font_size: 20
+    font_name: "RobotoMono-Regular"
+    markup: True
+    padding: 20, 20
+
+<HexAsciiViewClass@GridLayout>:
+    hextext: ""
+    asciitext: ""
+    cols: 2
+    height: self.minimum_height
+    size_hint_y: None
+    HexAsciiLabel:
+        text: root.hextext
+        width: 564+20+20
+    HexAsciiLabel:
+        text: root.asciitext
+        width: 192+20+20
+
+<MyWidget>
+    firstrv:firstrv
+    secondrv:secondrv
+
     GridLayout:
         cols: 2
         size: root.width, root.height
-        ScrollView:
+
+        RecycleView:
             size_hint_x: None
-            width: hex.width + ascii.width  
-
+            width: 564+20+20+192+20+20
+            id: firstrv
+            viewclass: 'HexAsciiViewClass'
             do_scroll: False, True
             bar_width: 15
             effect_cls: "ScrollEffect"
             scroll_type: ["bars"]
-
-            GridLayout:
-                cols: 2
-                height: self.minimum_height
+            RecycleBoxLayout:
+                id: layout
+                default_size: None, None
+                default_size_hint: 1, None
                 size_hint_y: None
+                height: self.minimum_height
+                orientation: 'vertical'
 
-                MyLabel:
-                    id: hex
-                    text: "Hex"
-                    width: 564+20+20
-                    padding: 20, 20
-
-                MyLabel:
-                    id: ascii
-                    text: "ASCII"
-                    width: 192+20+20
-                    padding: 20, 20
-
-        ScrollView:
+        RecycleView:
+            id: secondrv
+            viewclass: 'MarkerLabel'
             do_scroll: False, True
             bar_width: 15
             effect_cls: "ScrollEffect"
             scroll_type: ["bars"]
-
-            MyLabel:
-                id: markers
-                text: "Markers"
-                bold: True
-                width: root.width-hex.width-ascii.width
-                padding: 20, 20
-
+            RecycleBoxLayout:
+                id: layout
+                default_size: None, None
+                default_size_hint: 1, None
+                size_hint_y: None
+                height: self.minimum_height
+                orientation: 'vertical'
     Button:
         id: openfile
         text: "Open Artifact"

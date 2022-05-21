@@ -1,7 +1,7 @@
 import binascii
 from prefetch import *
 
-###############################################################################
+#######################################################################
 	# TODO: #
 	#########
 	# Fix the corner case for artifact not in database.
@@ -12,7 +12,7 @@ def tempLoader():
 	markerlist = []
 	templist = []
 	bytecount = 0
-	with open('decomp.pf', 'rb') as f:
+	with open('kape.pf', 'rb') as f:
 		for byte in iter(lambda: f.read(1), b''):
 			bytecount += 1
 			asciichar = int.from_bytes(byte, "big")
@@ -28,7 +28,7 @@ def tempLoader():
 					asciidata.append(chr(asciichar))
 				else:
 					asciidata.append(".")
-###############################################################################
+#######################################################################
 	def isPrefetch():
 		magic = "".join(hexdata[b] for b in range(3)).upper()
 		if magic == "4D414D": # MAM
@@ -41,7 +41,7 @@ def tempLoader():
 				print("Prefetch file is not compressed!")
 				return True
 			return False
-###############################################################################
+#######################################################################
 	def isMFT():
 		magic = "".join(hexdata[b] for b in range(4)).upper()
 		if magic == "42414144": # BAAD
@@ -51,7 +51,7 @@ def tempLoader():
 			print("MFT file is intact!")
 			return True
 		return False
-###############################################################################
+#######################################################################
 	def isRegistry():
 		magic = "".join(hexdata[b] for b in range(4)).upper()
 		if magic == "72656766": # regf
