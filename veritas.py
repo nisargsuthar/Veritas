@@ -6,7 +6,7 @@ import binascii
 import kivy
 from kivy.app import App
 from kivy.uix.widget import Widget
-from kivy.properties import StringProperty, ListProperty, ObjectProperty
+from kivy.properties import ObjectProperty
 #######################################################################
 	# TODO: #
 	#########
@@ -20,7 +20,6 @@ class MyWidget(Widget):
 
 	def openFile(self):
 		app = App.get_running_app()
-
 		loader = tempLoader()
 		if not loader[0]:
 			print("Artifact not found in the current database!")
@@ -56,17 +55,16 @@ class MyWidget(Widget):
 			hexdata = fixHex(hexdata)
 			asciidata = fixAscii(asciidata)
 			# print(hexdata)
-			# print(asciidata)
+			print(asciidata)
 
 			def joinHexAscii(hexd, asciid):
 				return {"hextext": hexd, "asciitext": asciid}
 			
-			finaltuple = []
+			first = []
 			for h, a in zip(hexdata.split("\n"), asciidata.split("\n")):
-				finaltuple.append(joinHexAscii(h, a))
-			first = finaltuple
-			# print(first)
+				first.append(joinHexAscii(h, a))
 			second = [{"text": "{}".format(line)} for line in markerdata.split("\t")]
+			# print(first)
 			# print(second)
 
 			self.ids.firstrv.data = first

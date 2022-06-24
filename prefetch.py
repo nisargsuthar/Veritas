@@ -4,15 +4,17 @@ from offsetter import *
 ######################################################################
 	# TODO: #
 	#########
-	# Write logic for marking dynamic data from template points.
+	# Find correct label for "PREVOLUMESINFORMATIONFILLER"
 
 def prefetchTemplate():
 	prefetchbytes = []
 	prefetchtemp = []
 	prefetchsizes = []
 	prefetchmarkers = []
-	with open('decomp.pf', 'rb') as f:
+	artifactsize = 0
+	with open('kape.pf', 'rb') as f:
 		for byte in iter(lambda: f.read(1), b''):
+			artifactsize+=1
 			prefetchbytes.append(binascii.hexlify(byte).decode("utf-8"))
 ######################################################################
 	# COMMON SECTION. #
@@ -154,25 +156,57 @@ def prefetchTemplate():
 			prefetchmarkers.append("\nUnknown (Sample duration in ms?)\nSeen: 0x01\n")
 			prefetchmarkers.append("\nUnknown\nSeen: 0x0001, 0xFFFF\n")
 
-	# prefetchmarkers.append("\nFile name strings\n")
+	filenamestringsoffset = int(swapEndianness("".join(prefetchbytes[b] for b in range(100, 104)).upper()), 16)
+	filenamestringssize = int(swapEndianness("".join(prefetchbytes[b] for b in range(104, 108)).upper()), 16)
+	# print(filenamestringssize, filenamestringsoffset)
+	volumesinformationoffset = int(swapEndianness("".join(prefetchbytes[b] for b in range(108, 112)).upper()), 16)
+	volumesinformationsize = int(swapEndianness("".join(prefetchbytes[b] for b in range(116, 120)).upper()), 16)
+	# print(volumesinformationsize, volumesinformationoffset)
+
+	sumtilltracechains = fileheadersize + fileinfosize + filemetricssize + tracechainssize
+	sumtillfns = filenamestringssize + filenamestringsoffset
+	sumtillvinfo = volumesinformationsize + volumesinformationoffset
+
+	prefns = [[1, filenamestringsoffset-sumtilltracechains]]
+	fns = [[1, filenamestringssize]]
+	# postfns = [[1, artifactsize-sumtillfns]]
+
+	previnfo = [[1, volumesinformationoffset-sumtillfns]]
+	vinfo = [[1, volumesinformationsize]]
+	# postvinfo = [[1, artifactsize-sumtillvinfo]]
+
+	prefetchmarkers.append("\n> PREFILENAMESTRINGSFILLER <\n")
+	prefetchmarkers.append("\nFile name strings\n")
+	# prefetchmarkers.append("\n> POSTFILENAMESTRINGSFILLER <\n")
+	prefetchmarkers.append("\n> PREVOLUMESINFORMATIONFILLER <\n")
+	prefetchmarkers.append("\nVolumes Information\n")
+	# prefetchmarkers.append("\n> POSTVOLUMESINFORMATIONFILLER <\n")
+
 	prefetchtemp.append(fileheader)
 	prefetchtemp.append(fileinfo)
 	prefetchtemp.append(filemetrics)
 	prefetchtemp.append(tracechains)
+	prefetchtemp.append(prefns)
+	prefetchtemp.append(fns)
+	# prefetchtemp.append(postfns)
+	prefetchtemp.append(previnfo)
+	prefetchtemp.append(vinfo)
+	# prefetchtemp.append(postvinfo)
+
 	
 	prefetchsizes.append(fileheadersize)
 	prefetchsizes.append(fileinfosize)
 	prefetchsizes.append(filemetricssize)
 	prefetchsizes.append(tracechainssize)
+	prefetchsizes.append(filenamestringsoffset-sumtilltracechains)
+	prefetchsizes.append(filenamestringssize)
+	# prefetchsizes.append(artifactsize-sumtillfns)
+	prefetchsizes.append(volumesinformationoffset-sumtillfns)
+	prefetchsizes.append(volumesinformationsize)
+	# prefetchsizes.append(artifactsize-sumtillvinfo)
 
 	absolute = toAbsolute(prefetchtemp, prefetchsizes)
-	# print(absolute)
-	filenamestringsoffset = "".join(prefetchbytes[b] for b in range(100, 104)).upper()
-	filenamestringssize = "".join(prefetchbytes[b] for b in range(104, 108)).upper()
+	
 
-	filenamestringsoffset = int(swapEndianness(filenamestringsoffset), 16)
-	filenamestringssize = int(swapEndianness(filenamestringssize), 16)
-	# print(filenamestringsoffset, filenamestringssize)
-	# absolute.append([filenamestringsoffset, filenamestringssize])
-
+	print(absolute)
 	return absolute, prefetchmarkers
