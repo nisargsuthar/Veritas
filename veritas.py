@@ -4,72 +4,74 @@ from loader import *
 from primer import *
 import binascii
 import kivy
+import webbrowser
+import loader
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.properties import ObjectProperty
-#######################################################################
-	# TODO: #
-	#########
-	# Decode for extended ASCII set.
-	# Add a HEX calculator.
-	# Implement FileChooser.
-	# Implement Tabs.
+from kivy.uix.filechooser import FileChooserIconView
+from kivy.uix.popup import Popup
+from kivy.uix.label import Label
+from kivy.lang import Builder
+
 class MyWidget(Widget):
 	firstrv = ObjectProperty(None)
 	secondrv = ObjectProperty(None)
 
+	def __init__(self, **kwargs):
+		super(MyWidget, self).__init__(**kwargs)
+
 	def openFile(self):
-		app = App.get_running_app()
-		loader = tempLoader()
-		if not loader[0]:
-			print("Artifact not found in the current database!")
-			# TODO: Add kivy popup.
+		self.file_chooser = FileChooserIconView(path='.')
+		popup = Popup(title='Choose a file', content=self.file_chooser, size_hint=(0.9, 0.9))
+		self.file_chooser.bind(on_submit=lambda instance, value, *args: self.loadFileCallback(value[0], popup))
+		popup.open()
+
+	def loadFileCallback(self, file_path, popup):
+		if file_path:
+			loader.load_data(file_path, self.updateRecycleViews, popup)
+
+	def updateRecycleViews(self, first_data, second_data, artifactsupported, popup):
+		if artifactsupported:
+			print("Callback flag is True")
+			self.ids.firstrv.data = first_data
+			self.ids.secondrv.data = second_data
+			self.ids.closefile.disabled = False
+			self.ids.closefile.opacity = 1
+			self.ids.openfile.disabled = True
+			self.ids.openfile.opacity = 0
+			popup.dismiss()
 		else:
-			hexdata = loader[1]
-			asciidata = loader[2]
-			markerdata = loader[3]
-			markerdatasize = len(markerdata)
-			templist = loader[4]
-			asciidata = escapeMarkup(asciidata)
-			savecolor = []
-			for color in c:
-				for pair in reversed(templist):
-					hexdata = colorBytes(hexdata, c[color], pair[0] - 1, pair[1] + 1)
-					asciidata = colorBytes(asciidata, c[color], pair[0] - 1, pair[1] + 1)
-					savecolor.append(color)
-					del templist[-1]
-					break
-			savecolor = reversed(savecolor)
-			i = 0
-			for color in savecolor:
-				while i < (markerdatasize-1)*3+2:
-					markerdata = colorBytes(markerdata, c[color], i, 2)
-					i += 3
-					break
-			hexdata = [s.upper()+" " if len(s) == 2 else s for s in hexdata]
+			content_label = Label(
+				text='Artifact not supported yet!\n\n'
+					 'Check [ref=more_info][u]supported artifacts[/u][/ref] here.',
+				font_size='24sp',
+				markup=True,
+				halign='center',
+				valign='middle',
+				on_ref_press=self.on_link_press
+			)
+			popup = Popup(
+				title='Error',
+				title_size='26sp',
+				content=content_label,
+				size_hint=(0.6, 0.3)
+			)
+			popup.open()
 
-			hexdata = listToString(hexdata)
-			asciidata = listToString(asciidata)
-			markerdata = listToString(markerdata)
+	def closeFile(self):
+		self.ids.firstrv.data = []
+		self.ids.secondrv.data = []
+		self.ids.closefile.disabled = True
+		self.ids.closefile.opacity = 0
+		self.ids.openfile.disabled = False
+		self.ids.openfile.opacity = 1
 
-			hexdata = fixHex(hexdata)
-			asciidata = fixAscii(asciidata)
-			# print(hexdata)
-			print(asciidata)
-
-			def joinHexAscii(hexd, asciid):
-				return {"hextext": hexd, "asciitext": asciid}
-			
-			first = []
-			for h, a in zip(hexdata.split("\n"), asciidata.split("\n")):
-				first.append(joinHexAscii(h, a))
-			second = [{"text": "{}".format(line)} for line in markerdata.split("\t")]
-			# print(first)
-			# print(second)
-
-			self.ids.firstrv.data = first
-			self.ids.secondrv.data = second
-			self.remove_widget(self.ids.openfile)
+	def on_link_press(self, instance, ref):
+		if ref == 'more_info':
+			# Handle the link click
+			print("Opening more information...")
+			webbrowser.open('https://github.com/nisargsuthar/VeritasHexViewer#supported-artifacts')
 
 class Veritas(App):
 	def build(self):

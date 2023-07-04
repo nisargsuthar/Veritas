@@ -43,7 +43,7 @@
             width: 564+20+20+192+20+20
             id: firstrv
             viewclass: 'HexAsciiViewClass'
-            do_scroll: False, True
+            do_scroll: True
             bar_width: 15
             effect_cls: "ScrollEffect"
             scroll_type: ["bars"]
@@ -58,7 +58,7 @@
         RecycleView:
             id: secondrv
             viewclass: 'MarkerLabel'
-            do_scroll: False, True
+            do_scroll: True
             bar_width: 15
             effect_cls: "ScrollEffect"
             scroll_type: ["bars"]
@@ -69,8 +69,23 @@
                 size_hint_y: None
                 height: self.minimum_height
                 orientation: 'vertical'
-    Button:
-        id: openfile
-        text: "Open Artifact"
-        font_size: 16
-        on_release: root.openFile()
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint_y: None
+        height: '48dp'
+        width: '500dp'
+        padding: '12dp'
+
+        Button:
+            id: openfile
+            text: "Open Artifact"
+            font_size: 16
+            on_release: root.openFile()
+
+        Button:
+            id: closefile
+            text: "Close"
+            font_size: 16
+            disabled: True
+            opacity: 0
+            on_release: root.closeFile()

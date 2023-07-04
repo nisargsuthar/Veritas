@@ -1,18 +1,20 @@
 import binascii
 from prefetch import *
+from primer import *
 
-#######################################################################
+#######################################################################################################
 	# TODO: #
 	#########
-	# Fix the corner case for artifact not in database.
 
-def tempLoader():
+def load_data(file_path, callback, popup):
 	hexdata = []
 	asciidata = []
 	markerlist = []
 	templist = []
+	first = []
+	second = []
 	bytecount = 0
-	with open('kape.pf', 'rb') as f:
+	with open(file_path, 'rb') as f:
 		for byte in iter(lambda: f.read(1), b''):
 			bytecount += 1
 			asciichar = int.from_bytes(byte, "big")
@@ -28,7 +30,7 @@ def tempLoader():
 					asciidata.append(chr(asciichar))
 				else:
 					asciidata.append(".")
-#######################################################################
+#######################################################################################################
 	def isPrefetch():
 		magic = "".join(hexdata[b] for b in range(3)).upper()
 		if magic == "4D414D": # MAM
@@ -41,7 +43,7 @@ def tempLoader():
 				print("Prefetch file is not compressed!")
 				return True
 			return False
-#######################################################################
+#######################################################################################################
 	def isMFT():
 		magic = "".join(hexdata[b] for b in range(4)).upper()
 		if magic == "42414144": # BAAD
@@ -51,25 +53,65 @@ def tempLoader():
 			print("MFT file is intact!")
 			return True
 		return False
-#######################################################################
+#######################################################################################################
 	def isRegistry():
 		magic = "".join(hexdata[b] for b in range(4)).upper()
 		if magic == "72656766": # regf
 			return True
 		return False
-
+#######################################################################################################
 	isprefetch = isPrefetch()
 	# ismft = isMFT()
 	# isregistry = isRegistry()
 
 	if isprefetch:
-		prefetch = prefetchTemplate()
+		prefetch = prefetchTemplate(file_path)
 		templist = prefetch[0]
 		markerdata = prefetch[1]
 	# elif ismft:
 	# elif isregistry:
-	else:
-		# ~~~TEMPORARY SPAGHETTI CODE~~~
-		templist = ["NOT", "FOUND"]
+#######################################################################################################
+	if isprefetch:
+		#or ismft or isregistry
+		artifactsupported = True
 
-	return True, hexdata, asciidata, markerdata, templist if isprefetch or ismft or isregistry else False, hexdata, asciidata, markerdata, templist
+		markerdatasize = len(markerdata)
+		asciidata = escapeMarkup(asciidata)
+		savecolor = []
+		for color in c:
+			for pair in reversed(templist):
+				hexdata = colorBytes(hexdata, c[color], pair[0] - 1, pair[1] + 1)
+				asciidata = colorBytes(asciidata, c[color], pair[0] - 1, pair[1] + 1)
+				savecolor.append(color)
+				del templist[-1]
+				break
+		savecolor = reversed(savecolor)
+		i = 0
+		for color in savecolor:
+			while i < (markerdatasize-1)*3+2:
+				markerdata = colorBytes(markerdata, c[color], i, 2)
+				i += 3
+				break
+		hexdata = [s.upper()+" " if len(s) == 2 else s for s in hexdata]
+	
+		hexdata = listToString(hexdata)
+		asciidata = listToString(asciidata)
+		markerdata = listToString(markerdata)
+	
+		hexdata = fixHex(hexdata)
+		asciidata = fixAscii(asciidata)
+		# print(hexdata)
+		# print(asciidata)
+
+		def joinHexAscii(hexd, asciid):
+			return {"hextext": hexd, "asciitext": asciid}
+		
+		for h, a in zip(hexdata.split("\n"), asciidata.split("\n")):
+			first.append(joinHexAscii(h, a))
+		second = [{"text": "{}".format(line)} for line in markerdata.split("\t")]
+		# print(first)
+		# print(second)
+	else:
+		artifactsupported = False
+
+	callback(first, second, artifactsupported, popup)
