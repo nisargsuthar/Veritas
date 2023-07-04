@@ -4,15 +4,15 @@ from offsetter import *
 ######################################################################
 	# TODO: #
 	#########
-	# Find correct label for "PREVOLUMESINFORMATIONFILLER"
+	# Place checks for the executable full path mystery section.
 
-def prefetchTemplate():
+def prefetchTemplate(file_path):
 	prefetchbytes = []
 	prefetchtemp = []
 	prefetchsizes = []
 	prefetchmarkers = []
 	artifactsize = 0
-	with open('kape.pf', 'rb') as f:
+	with open(file_path, 'rb') as f:
 		for byte in iter(lambda: f.read(1), b''):
 			artifactsize+=1
 			prefetchbytes.append(binascii.hexlify(byte).decode("utf-8"))
@@ -112,7 +112,7 @@ def prefetchTemplate():
 
 		case "1A000000":
 			# Was 8.1 > PFV 26
-			fileinfo = [[1, 4], [5, 4], [9, 4], [13, 4], [17, 4], [21, 4], [25, 4], [29, 4], [33, 4], [37, 8], [45, 8], [53, 56], [109, 16], [125, 4], [129, 4], [133, 4], [137, 88]]
+			fileinfo = [[1, 4], [5, 4], [9, 4], [13, 4], [17, 4], [21, 4], [25, 4], [29, 4], [33, 4], [37, 8], [45, 64], [109, 16], [125, 4], [129, 4], [133, 4], [137, 88]]
 			fileinfosize = 224
 			prefetchmarkers.extend(sharedFileInfoByVar1AndVer26)
 			
@@ -178,7 +178,7 @@ def prefetchTemplate():
 	prefetchmarkers.append("\n> PREFILENAMESTRINGSFILLER <\n")
 	prefetchmarkers.append("\nFile name strings\n")
 	# prefetchmarkers.append("\n> POSTFILENAMESTRINGSFILLER <\n")
-	prefetchmarkers.append("\n> PREVOLUMESINFORMATIONFILLER <\n")
+	prefetchmarkers.append("\n> HASH BUFFER ??? Possible:<\nApplication Prefetch: Path to executable responsible for the generated prefetch file.\nApplication Hosting Prefetch: Package name of hosted application. (See also: Same name directory under Program Files/WindowsApps/)")
 	prefetchmarkers.append("\nVolumes Information\n")
 	# prefetchmarkers.append("\n> POSTVOLUMESINFORMATIONFILLER <\n")
 
