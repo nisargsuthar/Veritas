@@ -1,4 +1,3 @@
-import binascii
 from prefetch import *
 from primer import *
 
@@ -7,74 +6,51 @@ from primer import *
 	#########
 
 def load_data(file_path, callback, popup):
-	hexdata = []
-	asciidata = []
-	markerlist = []
-	templist = []
+	file_name = getFilenameFromFilepath(file_path)
+	file_extension = getFileExtensionFromFilename(file_name)
 	first = []
 	second = []
-	bytecount = 0
-	with open(file_path, 'rb') as f:
-		for byte in iter(lambda: f.read(1), b''):
-			bytecount += 1
-			asciichar = int.from_bytes(byte, "big")
-			if bytecount % 16 == 0:
-				hexdata.append(binascii.hexlify(byte).decode("utf-8")+"\n")
-				if asciichar >= 32 and asciichar <= 126:
-					asciidata.append(chr(asciichar)+"\n")
-				else:
-					asciidata.append(".\n")
-			else:
-				hexdata.append(binascii.hexlify(byte).decode("utf-8"))
-				if asciichar >= 32 and asciichar <= 126:
-					asciidata.append(chr(asciichar))
-				else:
-					asciidata.append(".")
-#######################################################################################################
-	def isPrefetch():
-		magic = "".join(hexdata[b] for b in range(3)).upper()
-		if magic == "4D414D": # MAM
-			print("Prefetch file is compressed!")
-			return True
-			# IMPLEMENT KIVY POPUP TO ALERT ABOUT COMPRESSION.
+	hexdata = []
+	asciidata = []
+	templist = []
+	markerdata = []
+	artifactsupported = extensionmismatch = False
+	supportedextensions = [".pf"]
+	supportedfilenames = ["$MFT"] # For artifacts with no file extensions.
+
+	if file_extension is None:
+		# TODO: Handle automatic artifact detection.
+		if file_name in supportedfilenames:
+			match file_name:
+				case "$MFT":
+					if isMFT(file_path):
+						artifactsupported = True
+					else:
+						extensionmismatch = True
+					print("MFT")
+				case _:
+					artifactsupported = False
+	else:
+		if file_extension not in supportedextensions:
+			callback(first, second, False, popup)
 		else:
-			magic = "".join(hexdata[b] for b in range(4, 8)).upper()
-			if magic == "53434341": # SCCA
-				print("Prefetch file is not compressed!")
-				return True
-			return False
-#######################################################################################################
-	def isMFT():
-		magic = "".join(hexdata[b] for b in range(4)).upper()
-		if magic == "42414144": # BAAD
-			print("Error found in MFT entry!")
-			return True
-		elif magic == "46494C45": # FILE
-			print("MFT file is intact!")
-			return True
-		return False
-#######################################################################################################
-	def isRegistry():
-		magic = "".join(hexdata[b] for b in range(4)).upper()
-		if magic == "72656766": # regf
-			return True
-		return False
-#######################################################################################################
-	isprefetch = isPrefetch()
-	# ismft = isMFT()
-	# isregistry = isRegistry()
+			match file_extension:
+				case ".pf":
+					if isPrefetch(file_path):
+						artifactsupported = True
+						prefetch = prefetchTemplate(file_path)
+						hexdata = prefetch[0]
+						asciidata = prefetch[1]
+						templist = prefetch[2]
+						markerdata = prefetch[3]
+					else:
+						extensionmismatch = True
+				case _:
+					artifactsupported = False
 
-	if isprefetch:
-		prefetch = prefetchTemplate(file_path)
-		templist = prefetch[0]
-		markerdata = prefetch[1]
-	# elif ismft:
-	# elif isregistry:
-#######################################################################################################
-	if isprefetch:
-		#or ismft or isregistry
-		artifactsupported = True
+			#SHOW POPUP FOR EXTENSION MISMATCH
 
+	if artifactsupported:
 		markerdatasize = len(markerdata)
 		asciidata = escapeMarkup(asciidata)
 		savecolor = []
@@ -111,7 +87,5 @@ def load_data(file_path, callback, popup):
 		second = [{"text": "{}".format(line)} for line in markerdata.split("\t")]
 		# print(first)
 		# print(second)
-	else:
-		artifactsupported = False
 
-	callback(first, second, artifactsupported, popup)
+		callback(first, second, artifactsupported, popup)

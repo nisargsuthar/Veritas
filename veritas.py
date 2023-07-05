@@ -9,7 +9,7 @@ import loader
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.properties import ObjectProperty
-from kivy.uix.filechooser import FileChooserIconView
+from kivy.uix.filechooser import FileChooserListView
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
@@ -22,7 +22,7 @@ class MyWidget(BoxLayout):
 		super(MyWidget, self).__init__(**kwargs)
 
 	def openFile(self):
-		self.file_chooser = FileChooserIconView(path='.')
+		self.file_chooser = FileChooserListView(path='.')
 		popup = Popup(title='Choose a file', content=self.file_chooser, size_hint=(0.9, 0.9))
 		self.file_chooser.bind(on_submit=lambda instance, value, *args: self.loadFileCallback(value[0], popup))
 		popup.open()
