@@ -1,4 +1,5 @@
 import binascii
+from primer import *
 from offsetter import *
 
 ######################################################################
@@ -7,15 +8,16 @@ from offsetter import *
 	# Place checks for the executable full path mystery section.
 
 def prefetchTemplate(file_path):
-	prefetchbytes = []
 	prefetchtemp = []
 	prefetchsizes = []
 	prefetchmarkers = []
-	artifactsize = 0
-	with open(file_path, 'rb') as f:
-		for byte in iter(lambda: f.read(1), b''):
-			artifactsize+=1
-			prefetchbytes.append(binascii.hexlify(byte).decode("utf-8"))
+
+	getdata = getHexAsciiFromBytes(file_path)
+	formattedhexdata = getdata[0]
+	formattedasciidata = getdata[1]
+	hexdata = getdata[2]
+	# print(formattedhexdata)
+	# print(hexdata)
 ######################################################################
 	# COMMON SECTION. #
 	###################
@@ -67,7 +69,7 @@ def prefetchTemplate(file_path):
 ######################################################################
 	# VERSION SPECIFIC. #
 	#####################
-	version = "".join(prefetchbytes[b] for b in range(4)).upper()
+	version = "".join(hexdata[b] for b in range(4)).upper()
 	match version:
 		case "11000000":
 			# Was XP or 2003 > PFV 17
@@ -127,7 +129,7 @@ def prefetchTemplate(file_path):
 
 		case "1E000000":
 			# Was 10 or 11 > PFV 30
-			variant = "".join(prefetchbytes[b] for b in range(84, 88)).upper()
+			variant = "".join(hexdata[b] for b in range(84, 88)).upper()
 			match variant:
 				case "30010000":
 					# Variant 1
@@ -156,11 +158,11 @@ def prefetchTemplate(file_path):
 			prefetchmarkers.append("\nUnknown (Sample duration in ms?)\nSeen: 0x01\n")
 			prefetchmarkers.append("\nUnknown\nSeen: 0x0001, 0xFFFF\n")
 
-	filenamestringsoffset = int(swapEndianness("".join(prefetchbytes[b] for b in range(100, 104)).upper()), 16)
-	filenamestringssize = int(swapEndianness("".join(prefetchbytes[b] for b in range(104, 108)).upper()), 16)
+	filenamestringsoffset = int(swapEndianness("".join(hexdata[b] for b in range(100, 104)).upper()), 16)
+	filenamestringssize = int(swapEndianness("".join(hexdata[b] for b in range(104, 108)).upper()), 16)
 	# print(filenamestringssize, filenamestringsoffset)
-	volumesinformationoffset = int(swapEndianness("".join(prefetchbytes[b] for b in range(108, 112)).upper()), 16)
-	volumesinformationsize = int(swapEndianness("".join(prefetchbytes[b] for b in range(116, 120)).upper()), 16)
+	volumesinformationoffset = int(swapEndianness("".join(hexdata[b] for b in range(108, 112)).upper()), 16)
+	volumesinformationsize = int(swapEndianness("".join(hexdata[b] for b in range(116, 120)).upper()), 16)
 	# print(volumesinformationsize, volumesinformationoffset)
 
 	sumtilltracechains = fileheadersize + fileinfosize + filemetricssize + tracechainssize
@@ -206,7 +208,6 @@ def prefetchTemplate(file_path):
 	# prefetchsizes.append(artifactsize-sumtillvinfo)
 
 	absolute = toAbsolute(prefetchtemp, prefetchsizes)
+	# print(absolute)
 	
-
-	print(absolute)
-	return absolute, prefetchmarkers
+	return formattedhexdata, formattedasciidata, absolute, prefetchmarkers
