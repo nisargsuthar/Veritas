@@ -35,57 +35,61 @@
     secondrv:secondrv
 
     GridLayout:
-        cols: 2
+        rows: 2
         size: root.width, root.height
 
-        RecycleView:
-            size_hint_x: None
-            width: 564+20+20+192+20+20
-            id: firstrv
-            viewclass: 'HexAsciiViewClass'
-            do_scroll: True
-            bar_width: 15
-            effect_cls: "ScrollEffect"
-            scroll_type: ["bars"]
-            RecycleBoxLayout:
-                id: layout
-                default_size: None, None
-                default_size_hint: 1, None
-                size_hint_y: None
-                height: self.minimum_height
-                orientation: 'vertical'
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: '48dp'
+            width: '500dp'
+            padding: '12dp'
 
-        RecycleView:
-            id: secondrv
-            viewclass: 'MarkerLabel'
-            do_scroll: True
-            bar_width: 15
-            effect_cls: "ScrollEffect"
-            scroll_type: ["bars"]
-            RecycleBoxLayout:
-                id: layout
-                default_size: None, None
-                default_size_hint: 1, None
-                size_hint_y: None
-                height: self.minimum_height
-                orientation: 'vertical'
-    BoxLayout:
-        orientation: 'horizontal'
-        size_hint_y: None
-        height: '48dp'
-        width: '500dp'
-        padding: '12dp'
+            Button:
+                id: openfile
+                text: "Open Artifact"
+                font_size: 16
+                on_release: root.openFile()
 
-        Button:
-            id: openfile
-            text: "Open Artifact"
-            font_size: 16
-            on_release: root.openFile()
+            Button:
+                id: closefile
+                text: "Close"
+                font_size: 16
+                disabled: True
+                opacity: 0
+                on_release: root.closeFile()
 
-        Button:
-            id: closefile
-            text: "Close"
-            font_size: 16
-            disabled: True
-            opacity: 0
-            on_release: root.closeFile()
+        GridLayout:
+            cols: 2
+
+            RecycleView:
+                size_hint_x: None
+                width: 564+20+20+192+20+20
+                id: firstrv
+                viewclass: 'HexAsciiViewClass'
+                do_scroll: True
+                bar_width: 15
+                effect_cls: "ScrollEffect"
+                scroll_type: ["bars"]
+                RecycleBoxLayout:
+                    id: layout
+                    default_size: None, None
+                    default_size_hint: 1, None
+                    size_hint_y: None
+                    height: self.minimum_height
+                    orientation: 'vertical'
+
+            RecycleView:
+                id: secondrv
+                viewclass: 'MarkerLabel'
+                do_scroll: True
+                bar_width: 15
+                effect_cls: "ScrollEffect"
+                scroll_type: ["bars"]
+                RecycleBoxLayout:
+                    id: layout
+                    default_size: None, None
+                    default_size_hint: 1, None
+                    size_hint_y: None
+                    height: self.minimum_height
+                    orientation: 'vertical'
