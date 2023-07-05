@@ -10,11 +10,11 @@ from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.properties import ObjectProperty
 from kivy.uix.filechooser import FileChooserIconView
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
-from kivy.lang import Builder
 
-class MyWidget(Widget):
+class MyWidget(BoxLayout):
 	firstrv = ObjectProperty(None)
 	secondrv = ObjectProperty(None)
 
@@ -33,18 +33,21 @@ class MyWidget(Widget):
 
 	def updateRecycleViews(self, first_data, second_data, artifactsupported, popup):
 		if artifactsupported:
-			print("Callback flag is True")
 			self.ids.firstrv.data = first_data
 			self.ids.secondrv.data = second_data
-			self.ids.closefile.disabled = False
-			self.ids.closefile.opacity = 1
-			self.ids.openfile.disabled = True
+
+			# self.ids.openfile.size_hint_x = 0
 			self.ids.openfile.opacity = 0
+			self.ids.openfile.disabled = True
+
+			self.ids.closefile.disabled = False
+			# self.ids.closefile.size_hint_x = 1
+			self.ids.closefile.opacity = 1
 			popup.dismiss()
 		else:
 			content_label = Label(
 				text='Artifact not supported yet!\n\n'
-					 'Check [ref=more_info][u]supported artifacts[/u][/ref] here.',
+					 'Check [ref=supported_artifacts][u]supported artifacts[/u][/ref] here.',
 				font_size='24sp',
 				markup=True,
 				halign='center',
@@ -62,15 +65,17 @@ class MyWidget(Widget):
 	def closeFile(self):
 		self.ids.firstrv.data = []
 		self.ids.secondrv.data = []
+
 		self.ids.closefile.disabled = True
 		self.ids.closefile.opacity = 0
+		# self.ids.closefile.size_hint_x = 0
+
 		self.ids.openfile.disabled = False
 		self.ids.openfile.opacity = 1
+		# self.ids.openfile.size_hint_x = 1
 
 	def on_link_press(self, instance, ref):
-		if ref == 'more_info':
-			# Handle the link click
-			print("Opening more information...")
+		if ref == 'supported_artifacts':
 			webbrowser.open('https://github.com/nisargsuthar/VeritasHexViewer#supported-artifacts')
 
 class Veritas(App):
