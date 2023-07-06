@@ -8,7 +8,7 @@ from offsetter import *
 	# Place checks for the executable full path mystery section.
 
 def prefetchTemplate(file_path):
-	prefetchtemp = []
+	prefetchtemplate = []
 	prefetchsizes = []
 	prefetchmarkers = []
 
@@ -181,19 +181,19 @@ def prefetchTemplate(file_path):
 	prefetchmarkers.append("\nFile name strings\n")
 	# prefetchmarkers.append("\n> POSTFILENAMESTRINGSFILLER <\n")
 	prefetchmarkers.append("\n> HASH BUFFER ??? Possible:<\nApplication Prefetch: Path to executable responsible for the generated prefetch file.\nApplication Hosting Prefetch: Package name of hosted application. (See also: Same name directory under Program Files/WindowsApps/)")
-	prefetchmarkers.append("\nVolumes Information\n")
+	prefetchmarkers.append("\nVolumes Information\n\n")
 	# prefetchmarkers.append("\n> POSTVOLUMESINFORMATIONFILLER <\n")
 
-	prefetchtemp.append(fileheader)
-	prefetchtemp.append(fileinfo)
-	prefetchtemp.append(filemetrics)
-	prefetchtemp.append(tracechains)
-	prefetchtemp.append(prefns)
-	prefetchtemp.append(fns)
-	# prefetchtemp.append(postfns)
-	prefetchtemp.append(previnfo)
-	prefetchtemp.append(vinfo)
-	# prefetchtemp.append(postvinfo)
+	prefetchtemplate.append(fileheader)
+	prefetchtemplate.append(fileinfo)
+	prefetchtemplate.append(filemetrics)
+	prefetchtemplate.append(tracechains)
+	prefetchtemplate.append(prefns)
+	prefetchtemplate.append(fns)
+	# prefetchtemplate.append(postfns)
+	prefetchtemplate.append(previnfo)
+	prefetchtemplate.append(vinfo)
+	# prefetchtemplate.append(postvinfo)
 
 	
 	prefetchsizes.append(fileheadersize)
@@ -207,7 +207,7 @@ def prefetchTemplate(file_path):
 	prefetchsizes.append(volumesinformationsize)
 	# prefetchsizes.append(artifactsize-sumtillvinfo)
 
-	absolute = toAbsolute(prefetchtemp, prefetchsizes)
-	# print(absolute)
+	templatedata = toAbsolute(prefetchtemplate, prefetchsizes)
+	# print(templatedata)
 	
-	return formattedhexdata, formattedasciidata, absolute, prefetchmarkers
+	return formattedhexdata, formattedasciidata, templatedata, prefetchmarkers

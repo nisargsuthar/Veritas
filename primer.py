@@ -16,30 +16,6 @@ def listToString(s):
 		string += char  
 	return string
 
-def getFilenameFromFilepath(filepath):
-	#TODO: Test for Linux.
-	linuxorwindows = ["/", "\\"]
-	index = -1
-
-	for separator in linuxorwindows:
-		separator_index = filepath.rfind(separator)
-		if separator_index > index:
-			index = separator_index
-
-	if index != -1:
-		filename = filepath[index+1:]  # Add 1 to exclude the separator
-		return filename
-	else:
-		return None # Should be virtually impossible.
-
-def getFileExtensionFromFilename(filename):
-	index = filename.rfind(".")
-	if index != -1:
-		fileextension = filename[index:]
-		return fileextension
-	else:
-		return None
-
 def readPartialFile(filetoread, numberofbytestoread):
 	hexdata = []
 	bytecount = 0
