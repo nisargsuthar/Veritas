@@ -32,7 +32,7 @@ def load_data(file_path, callback, popup):
 					artifactsupported = False
 	else:
 		if file_extension not in supportedextensions:
-			callback(first, second, False, popup)
+			callback(first, second, False, file_path, popup)
 		else:
 			match file_extension:
 				case ".pf":
@@ -88,4 +88,4 @@ def load_data(file_path, callback, popup):
 		# print(first)
 		# print(second)
 
-		callback(first, second, artifactsupported, popup)
+		callback(first, second, artifactsupported, file_path, popup)

@@ -31,8 +31,11 @@ class MyWidget(BoxLayout):
 		if file_path:
 			loader.load_data(file_path, self.updateRecycleViews, popup)
 
-	def updateRecycleViews(self, first_data, second_data, artifactsupported, popup):
+	def updateRecycleViews(self, first_data, second_data, artifactsupported, file_path, popup):
 		if artifactsupported:
+			app = App.get_running_app()
+			app.title = "Veritas - [{}]".format(file_path)
+
 			self.ids.firstrv.data = first_data
 			self.ids.secondrv.data = second_data
 
@@ -43,7 +46,7 @@ class MyWidget(BoxLayout):
 			self.ids.closefile.disabled = False
 			# self.ids.closefile.size_hint_x = 1
 			self.ids.closefile.opacity = 1
-			popup.dismiss()
+			popup.dismiss()			
 		else:
 			content_label = Label(
 				text='Artifact not supported yet!\n\n'
@@ -63,6 +66,8 @@ class MyWidget(BoxLayout):
 			popup.open()
 
 	def closeFile(self):
+		app = App.get_running_app()
+		app.title = "Veritas"
 		self.ids.firstrv.data = []
 		self.ids.secondrv.data = []
 
@@ -80,6 +85,7 @@ class MyWidget(BoxLayout):
 
 class Veritas(App):
 	def build(self):
+		self.icon = r'images\Veritas.png'
 		return MyWidget()
 
 if __name__ == '__main__':
