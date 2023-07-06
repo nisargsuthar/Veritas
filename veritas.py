@@ -29,7 +29,7 @@ class MyWidget(BoxLayout):
 
 	def loadFileCallback(self, file_path, popup):
 		if file_path:
-			loader.load_data(file_path, self.updateRecycleViews, popup)
+			loader.loadData(file_path, self.updateRecycleViews, popup)
 
 	def updateRecycleViews(self, first_data, second_data, artifactsupported, file_path, popup):
 		if artifactsupported:
