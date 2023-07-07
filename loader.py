@@ -4,7 +4,6 @@ from primer import *
 #######################################################################################################
 	# TODO: #
 	#########
-	# Fix the case of crash when unsupported file is loaded after unloading a supported file.
 
 hexdata = []
 asciidata = []
@@ -54,6 +53,7 @@ def loadData(file_path, callback, popup):
 		asciidata = listToString(asciidata)
 		markerdata = listToString(markerdata)
 		
+		# print(hexdata)
 		hexdata = fixHex(hexdata)
 		asciidata = fixAscii(asciidata)
 		# print(hexdata)
