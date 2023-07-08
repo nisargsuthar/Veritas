@@ -41,15 +41,6 @@ def prefetchTemplate(file_path):
 	prefetchmarkers.append("\n+4 Volumes information offset\n")
 	prefetchmarkers.append("\n+4 Number of volumes\n")
 	prefetchmarkers.append("\n+4 Volumes information size\n")
-	
-	# sharedFileInfoByVar1AndVer26 = []
-	# sharedFileInfoByVar1AndVer26.append("\n+8 Unknown (Empty values)\n")
-	# sharedFileInfoByVar1AndVer26.append("\n+64 (8 * 8) Last run time(s)\nContains FILETIMEs, or 0 if not set\nThe first FILETIME is the most recent run time\n")
-	# sharedFileInfoByVar1AndVer26.append("\n+16 Unknown\nMostly empty values but seem to get filled the run after the 8 last run times have been filled.\nCould be remnant values.\n")
-	# sharedFileInfoByVar1AndVer26.append("\n+4 Run count\n")
-	# sharedFileInfoByVar1AndVer26.append("\n+4 Unknown\nSeen: 0x01, 0x02, 0x07\n")
-	# sharedFileInfoByVar1AndVer26.append("\n+4 Unknown\nSeen: 0x00, 0x03\n")
-	# sharedFileInfoByVar1AndVer26.append("\n+88 Unknown (Empty values)\n")
 
 	# sharedFileMetricsByVer232630 = []
 	# sharedFileMetricsByVer232630.append("\n+4 Unknown (Prefetch start time in ms?)\nCould be the index into the trace chain array as well, is this relationship implicit or explicit?\n")
@@ -94,9 +85,6 @@ def prefetchTemplate(file_path):
 			filemetricssize = numberoffilemetricsentries * 20 # 20 bytes per entry.
 			filemetrics = [[1, filemetricssize]]
 			prefetchmarkers.append("\n+{} File metrics array\n".format(filemetricssize))
-			# filemetricsentrybytemask = [4, 4, 4, 4, 4]
-			# filemetricsentry = generateEntriesFromByteMask(filemetricsentrybytemask, numberoffilemetricsentries * len(filemetricsentrybytemask))
-
 			# prefetchmarkers.append("\nUnknown (Prefetch start time in ms?)\nCould be the index into the trace chain array as well, is this relationship implicit or explicit?\n")
 			# prefetchmarkers.append("\nUnknown (Prefetch duration in ms?)\nCould be the number of entries in the trace chain as well, is this relationship implicit or explicit?\n")
 			# prefetchmarkers.append("\nFilename string offset\nThe offset is relative to the start of the filename strings\n")
@@ -105,8 +93,6 @@ def prefetchTemplate(file_path):
 
 			tracechainssize = numberoftracechainsentries * 12
 			tracechains = [[1, tracechainssize]]
-			# tracechainsentrybytemask = [4, 4, 1, 1, 2]
-			# tracechainsentry = generateEntriesFromByteMask(tracechainsentrybytemask, numberoftracechainsentries * len(tracechainsentrybytemask))
 
 			# prefetchmarkers.extend(sharedTraceChainsByVer172326)
 			prefetchmarkers.append("\n+{} Trace chains array\n".format(tracechainssize))
@@ -121,95 +107,77 @@ def prefetchTemplate(file_path):
 			prefetchmarkers.append("\n+4 Run count\n")
 			prefetchmarkers.append("\n+4 Unknown\nSeen: 0x01\n")
 			prefetchmarkers.append("\n+80 Unknown (Empty values)\n")
-
 			filemetricssize = numberoffilemetricsentries * 32
 			filemetrics = [[1, filemetricssize]]
 			prefetchmarkers.append("\n+{} File metrics array\n".format(filemetricssize))
-			# filemetricsentrybytemask = [4, 4, 4, 4, 4, 4, 8]
-			# filemetricsentry = generateEntriesFromByteMask(filemetricsentrybytemask, numberoffilemetricsentries * len(filemetricsentrybytemask))
-
 			# prefetchmarkers.extend(sharedFileMetricsByVer232630)
-
 			tracechainssize = numberoftracechainsentries * 12
 			tracechains = [[1, tracechainssize]]
-			# tracechainsentrybytemask = [4, 4, 1, 1, 2]
-			# tracechainsentry = generateEntriesFromByteMask(tracechainsentrybytemask, numberoftracechainsentries * len(tracechainsentrybytemask))
-
 			# prefetchmarkers.extend(sharedTraceChainsByVer172326)
 			prefetchmarkers.append("\n+{} Trace chains array\n".format(tracechainssize))
-
 
 		case "1A000000":
 			# Was 8.1 > PFV 26
 			fileinfo = [[1, 4], [5, 4], [9, 4], [13, 4], [17, 4], [21, 4], [25, 4], [29, 4], [33, 4], [37, 8], [45, 64], [109, 16], [125, 4], [129, 4], [133, 4], [137, 88]]
 			fileinfosize = 224
-			prefetchmarkers.extend(sharedFileInfoByVar1AndVer26)
-			
+			prefetchmarkers.append("\n+8 Unknown (Empty values)\n")
+			prefetchmarkers.append("\n+64 (8 * 8) Last run time(s)\nContains FILETIMEs, or 0 if not set\nThe first FILETIME is the most recent run time\n")
+			prefetchmarkers.append("\n+16 Unknown\nMostly empty values but seem to get filled the run after the 8 last run times have been filled.\nCould be remnant values.\n")
+			prefetchmarkers.append("\n+4 Run count\n")
+			prefetchmarkers.append("\n+4 Unknown\nSeen: 0x01, 0x02, 0x07\n")
+			prefetchmarkers.append("\n+4 Unknown\nSeen: 0x00, 0x03\n")
+			prefetchmarkers.append("\n+88 Unknown (Empty values)\n")
 			filemetricssize = numberoffilemetricsentries * 32
 			filemetrics = [[1, filemetricssize]]
 			prefetchmarkers.append("\n+{} File metrics array\n".format(filemetricssize))
-			# filemetricsentrybytemask = [4, 4, 4, 4, 4, 4, 8]
-			# filemetricsentry = generateEntriesFromByteMask(filemetricsentrybytemask, numberoffilemetricsentries * len(filemetricsentrybytemask))
-
 			# prefetchmarkers.extend(sharedFileMetricsByVer232630)
-
 			tracechainssize = numberoftracechainsentries * 12
 			tracechains = [[1, tracechainssize]]
-			# tracechainsentrybytemask = [4, 4, 1, 1, 2]
-			# tracechainsentry = generateEntriesFromByteMask(tracechainsentrybytemask, numberoftracechainsentries * len(tracechainsentrybytemask))
-
 			# prefetchmarkers.extend(sharedTraceChainsByVer172326)
 			prefetchmarkers.append("\n+{} Trace chains array\n".format(tracechainssize))
-
 
 		case "1E000000":
 			# Was 10 or 11 > PFV 30
 			variant = "".join(hexdata[b] for b in range(84, 88)).upper()
+			prefetchmarkers.append("\n+8 Unknown (Empty values)\n")
+			prefetchmarkers.append("\n+64 (8 * 8) Last run time(s)\nContains FILETIMEs, or 0 if not set\nThe first FILETIME is the most recent run time\n")
 
 			match variant:
 				case "30010000":
 					# Variant 1
 					hso = "".join(hexdata[b] for b in range(220, 224)).upper()
 					if hso == "00000000":
-						# Since both hash and non-hash variant 1 files have fileinfosize of 220.
 						fileinfo = [[1, 4], [5, 4], [9, 4], [13, 4], [17, 4], [21, 4], [25, 4], [29, 4], [33, 4], [37, 8], [45, 64], [109, 16], [125, 4], [129, 4], [133, 4], [137, 84]]
 					else:
 						hashstringexists = True
 						fileinfo = [[1, 4], [5, 4], [9, 4], [13, 4], [17, 4], [21, 4], [25, 4], [29, 4], [33, 4], [37, 8], [45, 64], [109, 16], [125, 4], [129, 4], [133, 4], [137, 4], [141, 4], [145, 76]]
 					fileinfosize = 220
-					prefetchmarkers.append("\n+8 Unknown (Empty values)\n")
-					prefetchmarkers.append("\n+64 (8 * 8) Last run time(s)\nContains FILETIMEs, or 0 if not set\nThe first FILETIME is the most recent run time\n")
 					prefetchmarkers.append("\n+16 Unknown\nMostly empty values but seem to get filled the run after the 8 last run times have been filled.\nCould be remnant values.\n")
 					prefetchmarkers.append("\n+4 Run count\n")
 					prefetchmarkers.append("\n+4 Unknown\nSeen: 0x01, 0x02, 0x07\n")
 					prefetchmarkers.append("\n+4 Unknown\nSeen: 0x00, 0x03\n")
-					if hashstringexists:
-						prefetchmarkers.append("\n+4 Hash string offset\n")
-						prefetchmarkers.append("\n+4 Hash string size\n")
-						prefetchmarkers.append("\n+76 Unknown (Empty values)\n")
-					else:
-						prefetchmarkers.append("\n+84 Unknown (Empty values)\n")
 				case "28010000":
 					# Variant 2
-					hashstringexists = True
-					fileinfo = [[1, 4], [5, 4], [9, 4], [13, 4], [17, 4], [21, 4], [25, 4], [29, 4], [33, 4], [37, 8], [45, 64], [109, 8], [117, 4], [121, 4], [125, 4], [129, 4], [133, 4], [137, 76]]
+					hso = "".join(hexdata[b] for b in range(212, 216)).upper()
+					if hso == "00000000":
+						fileinfo = [[1, 4], [5, 4], [9, 4], [13, 4], [17, 4], [21, 4], [25, 4], [29, 4], [33, 4], [37, 8], [45, 64], [109, 8], [117, 4], [121, 4], [125, 4], [129, 84]]
+					else:
+						hashstringexists = True
+						fileinfo = [[1, 4], [5, 4], [9, 4], [13, 4], [17, 4], [21, 4], [25, 4], [29, 4], [33, 4], [37, 8], [45, 64], [109, 8], [117, 4], [121, 4], [125, 4], [129, 4], [133, 4], [137, 76]]
 					fileinfosize = 212
-					prefetchmarkers.append("\n+8 Unknown (Empty values)\n")
-					prefetchmarkers.append("\n+64 (8 * 8) Last run time(s)\nContains FILETIMEs, or 0 if not set\nThe first FILETIME is the most recent run time\n")
 					prefetchmarkers.append("\n+8 Unknown\nMostly empty values but seem to get filled the run after the 8 last run times have been filled.\nCould be remnant values.\n")
 					prefetchmarkers.append("\n+4 Run count\n")
 					prefetchmarkers.append("\n+4 Unknown\nSeen: 0x01\n")
 					prefetchmarkers.append("\n+4 Unknown\nSeen: 0x03\n")
-					prefetchmarkers.append("\n+4 Hash string offset\n")
-					prefetchmarkers.append("\n+4 Hash string size\n")
-					prefetchmarkers.append("\n+76 Unknown (Empty values)\n")
+			if hashstringexists:
+				prefetchmarkers.append("\n+4 Hash string offset\n")
+				prefetchmarkers.append("\n+4 Hash string size\n")
+				prefetchmarkers.append("\n+76 Unknown (Empty values)\n")
+			else:
+				prefetchmarkers.append("\n+84 Unknown (Empty values)\n")
 			filemetricssize = numberoffilemetricsentries * 32
 			filemetrics = [[1, filemetricssize]]
 			prefetchmarkers.append("\n+{} File metrics array\n".format(filemetricssize))
-			# filemetricsentrybytemask = [4, 4, 4, 4, 4, 4, 8]
-			# filemetricsentry = generateEntriesFromByteMask(filemetricsentrybytemask, numberoffilemetricsentries * len(filemetricsentrybytemask))
-
-			# prefetchmarkers.extend(sharedFileMetricsByVer232630)
 
 			if hashstringexists:
 				hashstringoffsetlocation = fileheadersize + fileinfosize - 76 - 4 - 4
@@ -219,27 +187,18 @@ def prefetchTemplate(file_path):
 
 			tracechainssize = numberoftracechainsentries * 8
 			tracechains = [[1, tracechainssize]]
-			# tracechainsentrybytemask = [4, 1, 1, 2]
-			# tracechainsentry = generateEntriesFromByteMask(tracechainsentrybytemask, numberoftracechainsentries * len(tracechainsentrybytemask))
-
 			# prefetchmarkers.append("\nTotal block load count\nTotal number of blocks loaded (or fetched)\nThe block size 512k (512 * 1024) bytes\n")
 			# prefetchmarkers.append("\nUnknown\nSeen: 0x02, 0x03, 0x04, 0x08, 0x0A\n")
 			# prefetchmarkers.append("\nUnknown (Sample duration in ms?)\nSeen: 0x01\n")
 			# prefetchmarkers.append("\nUnknown\nSeen: 0x0001, 0xFFFF\n")
 			prefetchmarkers.append("\n+{} Trace chains array\n".format(tracechainssize))
 
-	
-
 	sumtilltracechains = fileheadersize + fileinfosize + filemetricssize + tracechainssize	
 	sumtillfilenamestrings = filenamestringssize + filenamestringsoffset
 	sumtillhashstring = hashstringsize + hashstringoffset
 	sumtillvolumeinformation = volumesinformationsize + volumesinformationoffset
-
 	sumtillhashstringorfilenamestrings = sumtillhashstring if hashstringexists else sumtillfilenamestrings
-
 	hashstringorfilenamestringspaddingsize = volumesinformationoffset - sumtillhashstringorfilenamestrings
-
-
 
 	filenamestrings = [[1, filenamestringssize]]
 	hashstring = [[1, hashstringsize]]
@@ -281,13 +240,3 @@ def prefetchTemplate(file_path):
 	# print(templatedata)
 	
 	return formattedhexdata, formattedasciidata, templatedata, prefetchmarkers
-
-# def generateEntriesFromByteMask(bytemask, loopcount):
-# 	result = [[1, bytemask[0]]]
-# 	for i in range(1, loopcount):
-# 		previous = result[-1]  # Get the previous sublist
-# 		index = previous[0] + previous[1]  # Generate the next index
-# 		value = bytemask[i % len(bytemask)]  # Cyclically loop through the byte mask
-# 		result.append([index, value])  # Append the new sublist to the result
-# 	print(result)
-# 	return result
