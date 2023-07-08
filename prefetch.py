@@ -73,6 +73,7 @@ def prefetchTemplate(file_path):
 	version = "".join(hexdata[b] for b in range(4)).upper()
 	numberoffilemetricsentries = int(swapEndianness("".join(hexdata[b] for b in range(88, 92)).upper()), 16)
 	numberoftracechainsentries = int(swapEndianness("".join(hexdata[b] for b in range(96, 100)).upper()), 16)
+	hashstringlength = 0
 
 	match version:
 		case "11000000":
@@ -161,8 +162,8 @@ def prefetchTemplate(file_path):
 			match variant:
 				case "30010000":
 					# Variant 1
-					fileinfo = [[1, 4], [5, 4], [9, 4], [13, 4], [17, 4], [21, 4], [25, 4], [29, 4], [33, 4], [37, 8], [45, 64], [109, 16], [125, 4], [129, 4], [133, 4], [137, 88]]
-					fileinfosize = 224
+					fileinfo = [[1, 4], [5, 4], [9, 4], [13, 4], [17, 4], [21, 4], [25, 4], [29, 4], [33, 4], [37, 8], [45, 64], [109, 16], [125, 4], [129, 4], [133, 4], [137, 84]]
+					fileinfosize = 220
 					prefetchmarkers.extend(sharedFileInfoByVar1AndVer26)
 				case "28010000":
 					# Variant 2
@@ -185,6 +186,11 @@ def prefetchTemplate(file_path):
 
 			# prefetchmarkers.extend(sharedFileMetricsByVer232630)
 
+			# hashstringoffsetlocation = fileheadersize + fileinfosize - 76 - 4 - 4
+			hashstringlengthlocation = fileheadersize + fileinfosize - 76 - 4
+			# hashstringoffset = int(swapEndianness("".join(hexdata[b] for b in range(hashstringoffsetlocation, hashstringoffsetlocation+4)).upper()), 16)
+			hashstringlength = int(swapEndianness("".join(hexdata[b] for b in range(hashstringlengthlocation, hashstringlengthlocation+4)).upper()), 16)
+
 			tracechainssize = numberoftracechainsentries * 8
 			tracechains = [[1, tracechainssize]]
 			# tracechainsentrybytemask = [4, 1, 1, 2]
@@ -201,31 +207,31 @@ def prefetchTemplate(file_path):
 	volumesinformationoffset = int(swapEndianness("".join(hexdata[b] for b in range(108, 112)).upper()), 16)
 	volumesinformationsize = int(swapEndianness("".join(hexdata[b] for b in range(116, 120)).upper()), 16)
 
-	# hashstringoffsetlocation = fileheadersize + fileinfosize - 76 - 4 - 4
-	hashstringsizelocation = fileheadersize + fileinfosize - 76 - 4
-	# hashstringoffset = int(swapEndianness("".join(hexdata[b] for b in range(hashstringoffsetlocation, hashstringoffsetlocation+4)).upper()), 16)
-	hashstringsize = int(swapEndianness("".join(hexdata[b] for b in range(hashstringsizelocation, hashstringsizelocation+4)).upper()), 16)
-
-
 	sumtilltracechains = fileheadersize + fileinfosize + filemetricssize + tracechainssize
-	sumtillfns = filenamestringssize + filenamestringsoffset
+	sumtillfilenamestrings = filenamestringssize + filenamestringsoffset
 	sumtillvolumeinformation = volumesinformationsize + volumesinformationoffset
+	hashstringorpaddingsize = volumesinformationoffset-sumtillfilenamestrings
 
-	prefns = [[1, filenamestringsoffset-sumtilltracechains]]
-	fns = [[1, filenamestringssize]]
-	hashstring = [[1, volumesinformationoffset-sumtillfns]]
+	filenamestrings = [[1, filenamestringssize]]
+	hashstring = [[1, hashstringorpaddingsize]]
 	volumeinformation = [[1, volumesinformationsize]]
 
 	prefetchmarkers.append("\n+{} File name strings\n".format(filenamestringssize))
-	prefetchmarkers.append("\n+{} Hash string\nApplication Prefetch > Path to executable responsible for the generated prefetch file.\nApplication Hosting Prefetch > Package name of hosted application.\n".format(hashstringsize))
+	if hashstringlength != 0:
+		prefetchmarkers.append("\n+{} Hash string\nApplication Prefetch > Path to executable responsible for the generated prefetch file.\nApplication Hosting Prefetch > Package name of hosted application.\n".format(hashstringlength))
+	elif hashstringorpaddingsize != 0:
+		prefetchmarkers.append("\n+{} Padding\n".format(hashstringorpaddingsize))
 	prefetchmarkers.append("\n+{} Volume information\n".format(volumesinformationsize))
 
 	prefetchtemplate.append(fileheader)
 	prefetchtemplate.append(fileinfo)
 	prefetchtemplate.append(filemetrics)
 	prefetchtemplate.append(tracechains)
-	prefetchtemplate.append(fns)
-	prefetchtemplate.append(hashstring)
+	prefetchtemplate.append(filenamestrings)
+	if hashstringlength != 0:
+		prefetchtemplate.append(hashstring)
+	elif hashstringorpaddingsize != 0:
+		prefetchtemplate.append([[1, hashstringorpaddingsize]])
 	prefetchtemplate.append(volumeinformation)
 	
 	prefetchsizes.append(fileheadersize)
@@ -233,7 +239,10 @@ def prefetchTemplate(file_path):
 	prefetchsizes.append(filemetricssize)
 	prefetchsizes.append(tracechainssize)
 	prefetchsizes.append(filenamestringssize)
-	prefetchsizes.append(volumesinformationoffset-sumtillfns)
+	if hashstringlength != 0:
+		prefetchsizes.append(hashstringorpaddingsize)
+	elif hashstringorpaddingsize != 0:
+		prefetchsizes.append(hashstringorpaddingsize)
 	prefetchsizes.append(volumesinformationsize)
 
 	# print(prefetchtemplate)
