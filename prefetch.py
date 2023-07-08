@@ -5,8 +5,8 @@ from offsetter import *
 ######################################################################
 	# TODO: #
 	#########
-	# Check for any fileinfo changes for variant 1.
 	# Update markers for file metrics array and trace chains array to include structure of a single entry.
+	# Implement logic to detect presence of hash string in Version 30, Variant 1. (As of now, it always assumes it present and so the template turns incorrect sometimes.)
 
 def prefetchTemplate(file_path):
 	prefetchtemplate = []
@@ -42,14 +42,14 @@ def prefetchTemplate(file_path):
 	prefetchmarkers.append("\n+4 Number of volumes\n")
 	prefetchmarkers.append("\n+4 Volumes information size\n")
 	
-	sharedFileInfoByVar1AndVer26 = []
-	sharedFileInfoByVar1AndVer26.append("\n+8 Unknown (Empty values)\n")
-	sharedFileInfoByVar1AndVer26.append("\n+64 (8 * 8) Last run time(s)\nContains FILETIMEs, or 0 if not set\nThe first FILETIME is the most recent run time\n")
-	sharedFileInfoByVar1AndVer26.append("\n+16 Unknown\nMostly empty values but seem to get filled the run after the 8 last run times have been filled.\nCould be remnant values.\n")
-	sharedFileInfoByVar1AndVer26.append("\n+4 Run count\n")
-	sharedFileInfoByVar1AndVer26.append("\n+4 Unknown\nSeen: 0x01, 0x02, 0x07\n")
-	sharedFileInfoByVar1AndVer26.append("\n+4 Unknown\nSeen: 0x00, 0x03\n")
-	sharedFileInfoByVar1AndVer26.append("\n+88 Unknown (Empty values)\n")
+	# sharedFileInfoByVar1AndVer26 = []
+	# sharedFileInfoByVar1AndVer26.append("\n+8 Unknown (Empty values)\n")
+	# sharedFileInfoByVar1AndVer26.append("\n+64 (8 * 8) Last run time(s)\nContains FILETIMEs, or 0 if not set\nThe first FILETIME is the most recent run time\n")
+	# sharedFileInfoByVar1AndVer26.append("\n+16 Unknown\nMostly empty values but seem to get filled the run after the 8 last run times have been filled.\nCould be remnant values.\n")
+	# sharedFileInfoByVar1AndVer26.append("\n+4 Run count\n")
+	# sharedFileInfoByVar1AndVer26.append("\n+4 Unknown\nSeen: 0x01, 0x02, 0x07\n")
+	# sharedFileInfoByVar1AndVer26.append("\n+4 Unknown\nSeen: 0x00, 0x03\n")
+	# sharedFileInfoByVar1AndVer26.append("\n+88 Unknown (Empty values)\n")
 
 	# sharedFileMetricsByVer232630 = []
 	# sharedFileMetricsByVer232630.append("\n+4 Unknown (Prefetch start time in ms?)\nCould be the index into the trace chain array as well, is this relationship implicit or explicit?\n")
@@ -71,9 +71,15 @@ def prefetchTemplate(file_path):
 	# VERSION SPECIFIC. #
 	#####################
 	version = "".join(hexdata[b] for b in range(4)).upper()
+	filemetricsoffset = int(swapEndianness("".join(hexdata[b] for b in range(84 , 88)).upper()), 16)
 	numberoffilemetricsentries = int(swapEndianness("".join(hexdata[b] for b in range(88, 92)).upper()), 16)
 	numberoftracechainsentries = int(swapEndianness("".join(hexdata[b] for b in range(96, 100)).upper()), 16)
-	hashstringsize = 0
+	hashstringexists = False
+	hashstringsize = hashstringoffset = 0
+	filenamestringsoffset = int(swapEndianness("".join(hexdata[b] for b in range(100, 104)).upper()), 16)
+	filenamestringssize = int(swapEndianness("".join(hexdata[b] for b in range(104, 108)).upper()), 16)
+	volumesinformationoffset = int(swapEndianness("".join(hexdata[b] for b in range(108, 112)).upper()), 16)
+	volumesinformationsize = int(swapEndianness("".join(hexdata[b] for b in range(116, 120)).upper()), 16)
 
 	match version:
 		case "11000000":
@@ -159,14 +165,33 @@ def prefetchTemplate(file_path):
 		case "1E000000":
 			# Was 10 or 11 > PFV 30
 			variant = "".join(hexdata[b] for b in range(84, 88)).upper()
+
 			match variant:
 				case "30010000":
 					# Variant 1
-					fileinfo = [[1, 4], [5, 4], [9, 4], [13, 4], [17, 4], [21, 4], [25, 4], [29, 4], [33, 4], [37, 8], [45, 64], [109, 16], [125, 4], [129, 4], [133, 4], [137, 84]]
+					hso = "".join(hexdata[b] for b in range(220, 224)).upper()
+					if hso == "00000000":
+						# Since both hash and non-hash variant 1 files have fileinfosize of 220.
+						fileinfo = [[1, 4], [5, 4], [9, 4], [13, 4], [17, 4], [21, 4], [25, 4], [29, 4], [33, 4], [37, 8], [45, 64], [109, 16], [125, 4], [129, 4], [133, 4], [137, 84]]
+					else:
+						hashstringexists = True
+						fileinfo = [[1, 4], [5, 4], [9, 4], [13, 4], [17, 4], [21, 4], [25, 4], [29, 4], [33, 4], [37, 8], [45, 64], [109, 16], [125, 4], [129, 4], [133, 4], [137, 4], [141, 4], [145, 76]]
 					fileinfosize = 220
-					prefetchmarkers.extend(sharedFileInfoByVar1AndVer26)
+					prefetchmarkers.append("\n+8 Unknown (Empty values)\n")
+					prefetchmarkers.append("\n+64 (8 * 8) Last run time(s)\nContains FILETIMEs, or 0 if not set\nThe first FILETIME is the most recent run time\n")
+					prefetchmarkers.append("\n+16 Unknown\nMostly empty values but seem to get filled the run after the 8 last run times have been filled.\nCould be remnant values.\n")
+					prefetchmarkers.append("\n+4 Run count\n")
+					prefetchmarkers.append("\n+4 Unknown\nSeen: 0x01, 0x02, 0x07\n")
+					prefetchmarkers.append("\n+4 Unknown\nSeen: 0x00, 0x03\n")
+					if hashstringexists:
+						prefetchmarkers.append("\n+4 Hash string offset\n")
+						prefetchmarkers.append("\n+4 Hash string size\n")
+						prefetchmarkers.append("\n+76 Unknown (Empty values)\n")
+					else:
+						prefetchmarkers.append("\n+84 Unknown (Empty values)\n")
 				case "28010000":
 					# Variant 2
+					hashstringexists = True
 					fileinfo = [[1, 4], [5, 4], [9, 4], [13, 4], [17, 4], [21, 4], [25, 4], [29, 4], [33, 4], [37, 8], [45, 64], [109, 8], [117, 4], [121, 4], [125, 4], [129, 4], [133, 4], [137, 76]]
 					fileinfosize = 212
 					prefetchmarkers.append("\n+8 Unknown (Empty values)\n")
@@ -186,10 +211,11 @@ def prefetchTemplate(file_path):
 
 			# prefetchmarkers.extend(sharedFileMetricsByVer232630)
 
-			hashstringoffsetlocation = fileheadersize + fileinfosize - 76 - 4 - 4
-			hashstringsizelocation = fileheadersize + fileinfosize - 76 - 4
-			hashstringoffset = int(swapEndianness("".join(hexdata[b] for b in range(hashstringoffsetlocation, hashstringoffsetlocation+4)).upper()), 16)
-			hashstringsize = int(swapEndianness("".join(hexdata[b] for b in range(hashstringsizelocation, hashstringsizelocation+4)).upper()), 16)
+			if hashstringexists:
+				hashstringoffsetlocation = fileheadersize + fileinfosize - 76 - 4 - 4
+				hashstringsizelocation = fileheadersize + fileinfosize - 76 - 4
+				hashstringoffset = int(swapEndianness("".join(hexdata[b] for b in range(hashstringoffsetlocation, hashstringoffsetlocation+4)).upper()), 16)
+				hashstringsize = int(swapEndianness("".join(hexdata[b] for b in range(hashstringsizelocation, hashstringsizelocation+4)).upper()), 16)
 
 			tracechainssize = numberoftracechainsentries * 8
 			tracechains = [[1, tracechainssize]]
@@ -202,17 +228,14 @@ def prefetchTemplate(file_path):
 			# prefetchmarkers.append("\nUnknown\nSeen: 0x0001, 0xFFFF\n")
 			prefetchmarkers.append("\n+{} Trace chains array\n".format(tracechainssize))
 
-	filenamestringsoffset = int(swapEndianness("".join(hexdata[b] for b in range(100, 104)).upper()), 16)
-	filenamestringssize = int(swapEndianness("".join(hexdata[b] for b in range(104, 108)).upper()), 16)
-	volumesinformationoffset = int(swapEndianness("".join(hexdata[b] for b in range(108, 112)).upper()), 16)
-	volumesinformationsize = int(swapEndianness("".join(hexdata[b] for b in range(116, 120)).upper()), 16)
+	
 
 	sumtilltracechains = fileheadersize + fileinfosize + filemetricssize + tracechainssize	
 	sumtillfilenamestrings = filenamestringssize + filenamestringsoffset
 	sumtillhashstring = hashstringsize + hashstringoffset
 	sumtillvolumeinformation = volumesinformationsize + volumesinformationoffset
 
-	sumtillhashstringorfilenamestrings = sumtillhashstring if hashstringsize != 0 else sumtillfilenamestrings
+	sumtillhashstringorfilenamestrings = sumtillhashstring if hashstringexists else sumtillfilenamestrings
 
 	hashstringorfilenamestringspaddingsize = volumesinformationoffset - sumtillhashstringorfilenamestrings
 
@@ -224,7 +247,7 @@ def prefetchTemplate(file_path):
 	volumeinformation = [[1, volumesinformationsize]]
 
 	prefetchmarkers.append("\n+{} File name strings\n".format(filenamestringssize))
-	if hashstringsize != 0:
+	if hashstringexists:
 		prefetchmarkers.append("\n+{} Hash string\nApplication Prefetch > Path to executable responsible for the generated prefetch file.\nApplication Hosting Prefetch > Package name of hosted application.\n".format(hashstringsize))
 	if hashstringorfilenamestringspaddingsize != 0:
 		prefetchmarkers.append("\n+{} Padding\n".format(hashstringorfilenamestringspaddingsize))
@@ -235,7 +258,7 @@ def prefetchTemplate(file_path):
 	prefetchtemplate.append(filemetrics)
 	prefetchtemplate.append(tracechains)
 	prefetchtemplate.append(filenamestrings)
-	if hashstringsize != 0:
+	if hashstringexists:
 		prefetchtemplate.append(hashstring)
 	if hashstringorfilenamestringspaddingsize != 0:
 		prefetchtemplate.append(hashstringorfilenamestringspadding)
@@ -246,7 +269,7 @@ def prefetchTemplate(file_path):
 	prefetchsizes.append(filemetricssize)
 	prefetchsizes.append(tracechainssize)
 	prefetchsizes.append(filenamestringssize)
-	if hashstringsize != 0:
+	if hashstringexists:
 		prefetchsizes.append(hashstringsize)
 	if hashstringorfilenamestringspaddingsize != 0:
 		prefetchsizes.append(hashstringorfilenamestringspaddingsize)

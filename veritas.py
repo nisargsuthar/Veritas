@@ -10,11 +10,10 @@ from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.properties import ObjectProperty
 from kivy.uix.filechooser import FileChooserListView
-from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
 
-class MyWidget(BoxLayout):
+class MyWidget(Widget):
 	firstrv = ObjectProperty(None)
 	secondrv = ObjectProperty(None)
 
