@@ -10,7 +10,7 @@ asciidata = []
 templatedata = []
 markerdata = []
 
-def loadData(file_path, callback, popup):
+def loadFile(file_path, callback, popup):
 	first = []
 	second = []
 	artifactsupported = False
@@ -68,6 +68,21 @@ def loadData(file_path, callback, popup):
 		# print(first)
 		# print(second)
 		callback(first, second, artifactsupported, file_path, popup)
+#######################################################################################################
+
+def isPrefetch(file_path):
+	hexdata = readPartialFile(file_path, 8)
+	magic = "".join(hexdata[b] for b in range(3)).upper()
+	if magic == "4D414D": # MAM
+		print("Prefetch file is compressed!")
+		return True
+		# IMPLEMENT KIVY POPUP TO ALERT ABOUT COMPRESSION.
+	else:
+		magic = "".join(hexdata[b] for b in range(4, 8)).upper()
+		if magic == "53434341": # SCCA
+			print("Prefetch file is not compressed!")
+			return True
+		return False
 
 def callPrefetch(file_path):
 	global hexdata, asciidata, templatedata, markerdata
@@ -77,8 +92,32 @@ def callPrefetch(file_path):
 	templatedata = prefetch[2]
 	markerdata = prefetch[3]
 
+#######################################################################################################
+
+def isMFT(file_path):
+	hexdata = readPartialFile(file_path, 4)
+	magic = "".join(hexdata[b] for b in range(4)).upper()
+	if magic == "42414144": # BAAD
+		print("Error found in MFT entry!")
+		return True
+	elif magic == "46494C45": # FILE
+		print("MFT file is intact!")
+		return True
+	return False
+
 def callMFT(file_path):
 	global hexdata, asciidata, templatedata, markerdata
 
+#######################################################################################################
+
+def isRegistry(file_path):
+	hexdata = readPartialFile(file_path, 4)
+	magic = "".join(hexdata[b] for b in range(4)).upper()
+	if magic == "72656766": # regf
+		return True
+	return False
+
 def callRegistry(file_path):
 	global hexdata, asciidata, templatedata, markerdata
+
+#######################################################################################################

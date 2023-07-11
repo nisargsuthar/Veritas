@@ -28,7 +28,7 @@ class MyWidget(Widget):
 
 	def loadFileCallback(self, file_path, popup):
 		if file_path:
-			loader.loadData(file_path, self.updateRecycleViews, popup)
+			loader.loadFile(file_path, self.updateRecycleViews, popup)
 
 	def updateRecycleViews(self, first_data, second_data, artifactsupported, file_path, popup):
 		if artifactsupported:
@@ -57,7 +57,7 @@ class MyWidget(Widget):
 				on_ref_press=self.on_link_press
 			)
 			popup = Popup(
-				title='Error',
+				title='Uh-oh',
 				title_size='26sp',
 				content=content_label,
 				size_hint=(0.6, 0.3)

@@ -6,19 +6,16 @@ from offsetter import *
 	# TODO: #
 	#########
 	# Update markers for file metrics array and trace chains array to include structure of a single entry.
-	# Implement logic to detect presence of hash string in Version 30, Variant 1. (As of now, it always assumes it present and so the template turns incorrect sometimes.)
 
 def prefetchTemplate(file_path):
 	prefetchtemplate = []
 	prefetchsizes = []
 	prefetchmarkers = []
 
-	getdata = getHexAsciiFromBytes(file_path)
+	getdata = readFile(file_path)
 	formattedhexdata = getdata[0]
 	formattedasciidata = getdata[1]
 	hexdata = getdata[2]
-	# print(formattedhexdata)
-	# print(hexdata)
 ######################################################################
 	# COMMON SECTION. #
 	###################
@@ -234,9 +231,6 @@ def prefetchTemplate(file_path):
 		prefetchsizes.append(hashstringorfilenamestringspaddingsize)
 	prefetchsizes.append(volumesinformationsize)
 
-	# print(prefetchtemplate)
-	# print(prefetchsizes)
 	templatedata = toAbsolute(prefetchtemplate, prefetchsizes)
-	# print(templatedata)
 	
 	return formattedhexdata, formattedasciidata, templatedata, prefetchmarkers
