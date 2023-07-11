@@ -16,10 +16,10 @@ def listToString(s):
 		string += char  
 	return string
 
-def readPartialFile(filetoread, numberofbytestoread):
+def readPartialFile(file_path, numberofbytestoread):
 	hexdata = []
 	bytecount = 0
-	with open(filetoread, 'rb') as f:
+	with open(file_path, 'rb') as f:
 		while bytecount <= numberofbytestoread:
 			byte = f.read(1)
 			if not byte:
@@ -28,12 +28,12 @@ def readPartialFile(filetoread, numberofbytestoread):
 			hexdata.append(byte.hex())
 	return hexdata
 
-def getHexAsciiFromBytes(filepath):
+def readFile(file_path):
 	formattedhexdata = []
 	hexdata = []
 	formattedasciidata = []
 	bytecount = 0
-	with open(filepath, 'rb') as f:
+	with open(file_path, 'rb') as f:
 		for byte in iter(lambda: f.read(1), b''):
 			bytecount += 1
 			asciichar = int.from_bytes(byte, "big")
@@ -111,38 +111,3 @@ def fixAscii(data):
 		data = data[:key] + "[color={}]".format(val) + data[key:]
 
 	return data.replace("\n[/color]", "\n")
-#######################################################################################################
-##########################################>>>ARTIFACT FUNCTIONS <<<####################################
-#######################################################################################################
-def isPrefetch(file_path):
-	hexdata = readPartialFile(file_path, 8)
-	magic = "".join(hexdata[b] for b in range(3)).upper()
-	if magic == "4D414D": # MAM
-		print("Prefetch file is compressed!")
-		return True
-		# IMPLEMENT KIVY POPUP TO ALERT ABOUT COMPRESSION.
-	else:
-		magic = "".join(hexdata[b] for b in range(4, 8)).upper()
-		if magic == "53434341": # SCCA
-			print("Prefetch file is not compressed!")
-			return True
-		return False
-#######################################################################################################
-def isMFT(file_path):
-	hexdata = readPartialFile(file_path, 4)
-	magic = "".join(hexdata[b] for b in range(4)).upper()
-	if magic == "42414144": # BAAD
-		print("Error found in MFT entry!")
-		return True
-	elif magic == "46494C45": # FILE
-		print("MFT file is intact!")
-		return True
-	return False
-#######################################################################################################
-def isRegistry(file_path):
-	hexdata = readPartialFile(file_path, 4)
-	magic = "".join(hexdata[b] for b in range(4)).upper()
-	if magic == "72656766": # regf
-		return True
-	return False
-#######################################################################################################
