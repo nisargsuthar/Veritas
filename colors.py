@@ -1,4 +1,4 @@
-c = {
+color_dict = {
 "red": "[color=FF0000]",
 "green": "[color=00FF00]",
 "blue": "[color=0000FF]",
@@ -860,4 +860,3 @@ c = {
 "ivory": "[color=FFFFF0]",
 "white": "[color=FFFFFF]"
 }
-cc = "[/color]"

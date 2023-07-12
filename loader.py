@@ -5,27 +5,41 @@ from primer import *
 	# TODO: #
 	#########
 
-hexdata = []
-asciidata = []
-templatedata = []
-markerdata = []
-
 def loadFile(file_path, callback, popup):
 	first = []
 	second = []
+	hexdata = []
+	asciidata = []
+	templatedata = []
+	markerdata = []
 	artifactsupported = False
 	
-	global hexdata, asciidata, templatedata, markerdata
+	# Read file partially once, upto bytes which are longest for an artifact among all artifacts.
+	# Update maxmagicseekamongsupportedartifacts if it is greater than current value, for the artifact you are parsing.
+	maxmagicseekamongsupportedartifacts = 8
+	hexdata = readPartialFile(file_path, maxmagicseekamongsupportedartifacts)
 
-	if isPrefetch(file_path):
+	if isPrefetch(hexdata):
 		artifactsupported = True
-		callPrefetch(file_path)
-	elif isMFT(file_path):
+		prefetch = prefetchTemplate(file_path)
+		hexdata = prefetch[0]
+		asciidata = prefetch[1]
+		templatedata = prefetch[2]
+		markerdata = prefetch[3]
+	elif isMFT(hexdata):
 		artifactsupported = True
-		callMFT(file_path)
-	elif isRegistry(file_path):
+		mft = mftTemplate(file_path)
+		hexdata = mft[0]
+		asciidata = mft[1]
+		templatedata = mft[2]
+		markerdata = mft[3]
+	elif isRegistry(hexdata):
 		artifactsupported = True
-		callRegistry(file_path)
+		registry = registryTemplate(file_path)
+		hexdata = registry[0]
+		asciidata = registry[1]
+		templatedata = registry[2]
+		markerdata = registry[3]
 	else:
 		callback(first, second, artifactsupported, file_path, popup)
 
@@ -33,10 +47,10 @@ def loadFile(file_path, callback, popup):
 		markerdatasize = len(markerdata)
 		asciidata = escapeMarkup(asciidata)
 		savecolor = []
-		for color in c:
+		for color in color_dict:
 			for pair in reversed(templatedata):
-				hexdata = colorBytes(hexdata, c[color], pair[0] - 1, pair[1] + 1)
-				asciidata = colorBytes(asciidata, c[color], pair[0] - 1, pair[1] + 1)
+				hexdata = colorBytes(hexdata, color_dict[color], pair[0] - 1, pair[1] + 1)
+				asciidata = colorBytes(asciidata, color_dict[color], pair[0] - 1, pair[1] + 1)
 				savecolor.append(color)
 				del templatedata[-1]
 				break
@@ -44,7 +58,7 @@ def loadFile(file_path, callback, popup):
 		i = 0
 		for color in savecolor:
 			while i < (markerdatasize-1)*3+2:
-				markerdata = colorBytes(markerdata, c[color], i, 2)
+				markerdata = colorBytes(markerdata, color_dict[color], i, 2)
 				i += 3
 				break
 		hexdata = [s.upper()+" " if len(s) == 2 else s for s in hexdata]
@@ -53,11 +67,8 @@ def loadFile(file_path, callback, popup):
 		asciidata = listToString(asciidata)
 		markerdata = listToString(markerdata)
 		
-		# print(hexdata)
 		hexdata = fixHex(hexdata)
 		asciidata = fixAscii(asciidata)
-		# print(hexdata)
-		# print(asciidata)
 
 		def joinHexAscii(hdata, adata):
 			return {"hextext": hdata, "asciitext": adata}
@@ -70,8 +81,7 @@ def loadFile(file_path, callback, popup):
 		callback(first, second, artifactsupported, file_path, popup)
 #######################################################################################################
 
-def isPrefetch(file_path):
-	hexdata = readPartialFile(file_path, 8)
+def isPrefetch(hexdata):
 	magic = "".join(hexdata[b] for b in range(3)).upper()
 	if magic == "4D414D": # MAM
 		print("Prefetch file is compressed!")
@@ -84,18 +94,9 @@ def isPrefetch(file_path):
 			return True
 		return False
 
-def callPrefetch(file_path):
-	global hexdata, asciidata, templatedata, markerdata
-	prefetch = prefetchTemplate(file_path)
-	hexdata = prefetch[0]
-	asciidata = prefetch[1]
-	templatedata = prefetch[2]
-	markerdata = prefetch[3]
-
 #######################################################################################################
 
-def isMFT(file_path):
-	hexdata = readPartialFile(file_path, 4)
+def isMFT(hexdata):
 	magic = "".join(hexdata[b] for b in range(4)).upper()
 	if magic == "42414144": # BAAD
 		print("Error found in MFT entry!")
@@ -105,19 +106,12 @@ def isMFT(file_path):
 		return True
 	return False
 
-def callMFT(file_path):
-	global hexdata, asciidata, templatedata, markerdata
-
 #######################################################################################################
 
-def isRegistry(file_path):
-	hexdata = readPartialFile(file_path, 4)
+def isRegistry(hexdata):
 	magic = "".join(hexdata[b] for b in range(4)).upper()
 	if magic == "72656766": # regf
 		return True
 	return False
-
-def callRegistry(file_path):
-	global hexdata, asciidata, templatedata, markerdata
 
 #######################################################################################################
