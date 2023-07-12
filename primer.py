@@ -1,32 +1,31 @@
 import binascii
-from colors import *
+from colors import color_dict
 
 def colorBytes(data, col, pos, howmany):
-	data.insert(pos, col)
-	data.insert(pos+howmany, cc)
-	# print(data)
-	return data
+    return data[:pos] + [col] + data[pos:pos + howmany - 1] + ["[/color]"] + data[pos + howmany - 1:]
 
 def escapeMarkup(data):
-	return [c.replace("&", "&amp;").replace("[", "&bl;").replace("]", "&br;") for c in data]
+    escaped_data = []
+    replacements = {
+        "&": "&amp;",
+        "[": "&bl;",
+        "]": "&br;"
+    }
+    for c in data:
+        if c in replacements:
+            escaped_data.append(replacements[c])
+        else:
+            escaped_data.append(c)
+    return escaped_data
 
-def listToString(s): 
-	string = ""
-	for char in s: 
-		string += char  
-	return string
+def listToString(s):
+    return ''.join([str(char) for char in s])
 
 def readPartialFile(file_path, numberofbytestoread):
-	hexdata = []
-	bytecount = 0
-	with open(file_path, 'rb') as f:
-		while bytecount <= numberofbytestoread:
-			byte = f.read(1)
-			if not byte:
-				break  # Exit the loop if end of file is reached
-			bytecount += 1
-			hexdata.append(byte.hex())
-	return hexdata
+    with open(file_path, 'rb') as f:
+        data = f.read(numberofbytestoread)
+        hexdata = [format(byte, '02x') for byte in data]
+    return hexdata
 
 def readFile(file_path):
 	formattedhexdata = []
@@ -34,23 +33,20 @@ def readFile(file_path):
 	formattedasciidata = []
 	bytecount = 0
 	with open(file_path, 'rb') as f:
-		for byte in iter(lambda: f.read(1), b''):
+		while True:
+			byte = f.read(1)
+			if not byte:
+				break
 			bytecount += 1
 			asciichar = int.from_bytes(byte, "big")
-			hexdata.append(binascii.hexlify(byte).decode("utf-8"))
+			hex_str = binascii.hexlify(byte).decode("cp1252")
+			hexdata.append(hex_str)
+			ascii_str = chr(asciichar) if 32 <= asciichar <= 126 else "."
 			if bytecount % 16 == 0:
-				formattedhexdata.append(binascii.hexlify(byte).decode("utf-8")+"\n")
-				if asciichar >= 32 and asciichar <= 126:
-					formattedasciidata.append(chr(asciichar)+"\n")
-				else:
-					formattedasciidata.append(".\n")
-			else:
-				formattedhexdata.append(binascii.hexlify(byte).decode("utf-8"))
-				if asciichar >= 32 and asciichar <= 126:
-					formattedasciidata.append(chr(asciichar))
-				else:
-					formattedasciidata.append(".")
-
+				hex_str += "\n"
+				ascii_str += "\n"
+			formattedhexdata.append(hex_str)
+			formattedasciidata.append(ascii_str)
 	return formattedhexdata, formattedasciidata, hexdata
 
 def fixHex(data):
@@ -76,12 +72,9 @@ def fixHex(data):
 				bi += 6
 				lastColor = ""
 		bi += 2
-	
 	colors = {key:val for key, val in colors.items() if val != ""}
-	
 	for key, val in reversed(colors.items()):
 		data = data[:key] + "[color={}]".format(val) + data[key:]
-
 	return data.replace("\n[/color]", "\n")
 
 def fixAscii(data):
@@ -104,10 +97,7 @@ def fixAscii(data):
 				bi += 7
 				lastColor = ""
 		bi += 1
-	
 	colors = {key:val for key, val in colors.items() if val != ""}
-	
 	for key, val in reversed(colors.items()):
 		data = data[:key] + "[color={}]".format(val) + data[key:]
-
 	return data.replace("\n[/color]", "\n")
