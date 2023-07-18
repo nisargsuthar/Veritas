@@ -6,6 +6,7 @@ import binascii
 import kivy
 import webbrowser
 import loader
+import os
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.properties import ObjectProperty
@@ -28,7 +29,8 @@ class MyWidget(Widget):
 
 	def loadFileCallback(self, file_path, popup):
 		if file_path:
-			loader.loadFile(file_path, self.updateRecycleViews, popup)
+			bytecount = os.path.getsize(file_path)
+			loader.loadFile(file_path, bytecount, self.updateRecycleViews, popup)
 
 	def updateRecycleViews(self, first_data, second_data, artifactsupported, file_path, popup):
 		if artifactsupported:
