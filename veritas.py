@@ -82,7 +82,7 @@ class MyWidget(Widget):
 
 	def on_link_press(self, instance, ref):
 		if ref == 'supported_artifacts':
-			webbrowser.open('https://github.com/nisargsuthar/VeritasHexViewer#supported-artifacts')
+			webbrowser.open('https://github.com/nisargsuthar/Veritas#supported-artifacts')
 
 class Veritas(App):
 	def build(self):
