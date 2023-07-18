@@ -24,7 +24,7 @@ def listToString(s):
 def readPartialFile(file_path, numberofbytestoread):
     with open(file_path, 'rb') as f:
         data = f.read(numberofbytestoread)
-        hexdata = [format(byte, '02x') for byte in data]
+        hexdata = [format(byte, '02X') for byte in data]
     return hexdata
 
 def readFile(file_path):
@@ -48,6 +48,14 @@ def readFile(file_path):
 			formattedhexdata.append(hex_str)
 			formattedasciidata.append(ascii_str)
 	return formattedhexdata, formattedasciidata, hexdata
+
+def joinOffsetHexAscii(offsetdata, hexdata, asciidata):
+			return {"offsettext": offsetdata, "hextext": hexdata, "asciitext": asciidata}
+
+def getOffsets(bytecount):
+	bytecount += 16 if bytecount % 16 != 0 else 0
+	offsetdata = [f"{i:06X}" for i in range(0, bytecount, 16)]
+	return offsetdata
 
 def fixHex(data):
 	bi = 0

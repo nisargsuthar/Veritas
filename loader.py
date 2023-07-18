@@ -5,9 +5,10 @@ from primer import *
 	# TODO: #
 	#########
 
-def loadFile(file_path, callback, popup):
+def loadFile(file_path, bytecount, callback, popup):
 	first = []
 	second = []
+	offsetdata = getOffsets(int(bytecount))
 	hexdata = []
 	asciidata = []
 	templatedata = []
@@ -21,25 +22,13 @@ def loadFile(file_path, callback, popup):
 
 	if isPrefetch(hexdata):
 		artifactsupported = True
-		prefetch = prefetchTemplate(file_path)
-		hexdata = prefetch[0]
-		asciidata = prefetch[1]
-		templatedata = prefetch[2]
-		markerdata = prefetch[3]
+		hexdata, asciidata, templatedata, markerdata = prefetchTemplate(file_path)
 	elif isMFT(hexdata):
 		artifactsupported = True
-		mft = mftTemplate(file_path)
-		hexdata = mft[0]
-		asciidata = mft[1]
-		templatedata = mft[2]
-		markerdata = mft[3]
+		hexdata, asciidata, templatedata, markerdata = mftTemplate(file_path)
 	elif isRegistry(hexdata):
 		artifactsupported = True
-		registry = registryTemplate(file_path)
-		hexdata = registry[0]
-		asciidata = registry[1]
-		templatedata = registry[2]
-		markerdata = registry[3]
+		hexdata, asciidata, templatedata, markerdata = registryTemplate(file_path)
 	else:
 		callback(first, second, artifactsupported, file_path, popup)
 
@@ -95,15 +84,11 @@ def loadFile(file_path, callback, popup):
 		hexdata = fixHex(hexdata)
 		asciidata = fixAscii(asciidata)
 
-		# Construct a dictionary for RecycleViews.
-		def joinHexAscii(hdata, adata):
-			return {"hextext": hdata, "asciitext": adata}
-
-		# Combine hex and ascii for a single RecycleView so they share common scrolling.
-		for h, a in zip(hexdata.split("\n"), asciidata.split("\n")):
-			first.append(joinHexAscii(h, a))
-		# 
-		second = [{"text": "{}".format(line)} for line in markerdata.split("\t")]
+		# Combine offset, hex and ascii for a single RecycleView so they share common scrolling.
+		for o, h, a in zip(offsetdata, hexdata.split("\n"), asciidata.split("\n")):
+			first.append(joinOffsetHexAscii(o, h, a))
+		# Again leveraging Kivy not minding missing closing color tags, markerdata is split on it.
+		second = [{"text": "{}".format(line)} for line in markerdata.split("[/color]")]
 		callback(first, second, artifactsupported, file_path, popup)
 #######################################################################################################
 

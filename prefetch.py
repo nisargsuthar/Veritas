@@ -13,16 +13,13 @@ def prefetchTemplate(file_path):
 	prefetchsizes = []
 	prefetchmarkers = []
 
-	getdata = readFile(file_path)
-	formattedhexdata = getdata[0]
-	formattedasciidata = getdata[1]
-	hexdata = getdata[2]
+	formattedhexdata, formattedasciidata, hexdata = readFile(file_path)
 #######################################################################################################
 	# COMMON SECTION. #
 	###################
 	fileheader = [[1, 4], [5, 4], [9, 4], [13, 4], [17, 60], [77, 4], [81, 4]]
 	fileheadersize = 84
-	prefetchmarkers.append("+4  Format version    \n17 (0x11) > Windows XP, Windows 2003    \n23 (0x17) > Windows Vista, Windows 7    \n26 (0x1A) > Windows 8.1    \n30 (0x1E) > Windows 10\n")
+	prefetchmarkers.append("+4  Format version    \n    17 (0x00000011) > Windows XP, Windows 2003    \n    23 (0x00000017) > Windows Vista, Windows 7    \n    26 (0x0000001A) > Windows 8.1    \n    30 (0x0000001E) > Windows 10\n")
 	prefetchmarkers.append("\n+4  Signature\n")
 	prefetchmarkers.append("\n+4  Unknown\nSeen: 0x0000000F, 0x00000011\n")
 	prefetchmarkers.append("\n+4  File size\n")
@@ -30,7 +27,7 @@ def prefetchTemplate(file_path):
 	prefetchmarkers.append("\n+4 Prefetch hash\nThis value should correspond with the hash in the Prefetch filename\n")
 	prefetchmarkers.append("\n+4 Unknown (flags?)\n0x01 > is boot prefetch\n(Seen in: NTOSBOOT-B00DFAAD.pf, Op-EXPLORER.EXE-A80E4F97-000000F5.pf)\n")
 
-	prefetchmarkers.append("\n+4 File metrics array offset\nThe offset is relative to the start of the file\n0x98 > Version 17\n0xF0 > Version 23\n0x3001 > Version 26\n0x3001 > Version 30, Variant 1\n0x2801 > Version 30, Variant 2\n")
+	prefetchmarkers.append("\n+4 File metrics array offset\n    The offset is relative to the start of the file\n    0x00000098 > Version 17\n    0x000000F0 > Version 23\n    0x00000130 > Version 26\n    0x00000130 > Version 30, Variant 1\n    0x00000128 > Version 30, Variant 2\n")
 	prefetchmarkers.append("\n+4 Number of file metrics entries\n")
 	prefetchmarkers.append("\n+4 Trace chains array offset\nThe offset is relative to the start of the file\n")
 	prefetchmarkers.append("\n+4 Number of trace chains array entries\n")
@@ -40,9 +37,9 @@ def prefetchTemplate(file_path):
 	prefetchmarkers.append("\n+4 Number of volumes\n")
 	prefetchmarkers.append("\n+4 Volumes information size\n")
 
-	sharedFileMetricsByVer232630 = "\n    Each entry (+32) contains:\n        +4 Unknown (Prefetch start time in ms?)\n        Could be the index into the trace chain array as well, is this relationship implicit or explicit?\n        +4 Unknown (Prefetch duration in ms?)\n        Could be the number of entries in the trace chain as well, is this relationship implicit or explicit?\n        +4 Unknown (Average prefetch duration in ms?)\n        +4 Filename string offset\n        The offset is relative to the start of the filename strings\n        +4 Filename string number of characters\n        Does not include the end-of-string character\n        +4 Unknown (Flags?)\n        Seen: 0x00000001, 0x00000002, 0x00000003, 0x00000200, 0x00000202\n        +8 File reference\n        Contains a file reference of the file corresponding to the filename string or 0 if not set\n        NTFS:\n        First 6 bytes > MFT entry index\n        Last 2 bytes > Sequence number\n"
+	sharedFileMetricsByVer232630 = "    Each entry (+32) contains:\n        +4 Unknown (Prefetch start time in ms?)\n        Could be the index into the trace chain array as well, is this relationship implicit or explicit?\n        +4 Unknown (Prefetch duration in ms?)\n        Could be the number of entries in the trace chain as well, is this relationship implicit or explicit?\n        +4 Unknown (Average prefetch duration in ms?)\n        +4 Filename string offset\n        The offset is relative to the start of the filename strings\n        +4 Filename string number of characters\n        Does not include the end-of-string character\n        +4 Unknown (Flags?)\n        Seen: 0x00000001, 0x00000002, 0x00000003, 0x00000200, 0x00000202\n        +8 File reference\n        Contains a file reference of the file corresponding to the filename string or 0 if not set\n        NTFS:\n        First 6 bytes > MFT entry index\n        Last 2 bytes > Sequence number\n"
 
-	sharedTraceChainsByVer172326 = "\n    Each entry (+12) contains:\n        +4 Next array entry index\n        Contains the next trace chain array entry index in the chain, where the first entry index starts with 0, or -1 (0xFFFFFFFF) for the end-of-chain.\n        +4 Total block load count\n        Total number of blocks loaded (or fetched)\n        The block size 512k (512 * 1024) bytes\n        +1 Unknown\n        Seen: 0x02, 0x03, 0x04, 0x08, 0x0A\n        +1 Unknown (Sample duration in ms?)\n        Seen: 0x01\n        +2 Unknown\n        Seen: 0x0001, 0xFFFF\n"
+	sharedTraceChainsByVer172326 = "    Each entry (+12) contains:\n        +4 Next array entry index\n        Contains the next trace chain array entry index in the chain, where the first entry index starts with 0, or -1 (0xFFFFFFFF) for the end-of-chain.\n        +4 Total block load count\n        Total number of blocks loaded (or fetched)\n        The block size 512k (512 * 1024) bytes\n        +1 Unknown\n        Seen: 0x02, 0x03, 0x04, 0x08, 0x0A\n        +1 Unknown (Sample duration in ms?)\n        Seen: 0x01\n        +2 Unknown\n        Seen: 0x0001, 0xFFFF\n"
 
 ######################################################################
 	# VERSION SPECIFIC. #
@@ -70,12 +67,12 @@ def prefetchTemplate(file_path):
 			
 			filemetricssize = numberoffilemetricsentries * 20
 			filemetrics = [[1, filemetricssize]]
-			prefetchmarkers.append("\n+{} File metrics array\n\n    Each entry (+20) contains:\n        +4 Unknown (Prefetch start time in ms?)\n        Could be the index into the trace chain array as well, is this relationship implicit or explicit?\n        +4 Unknown (Prefetch duration in ms?)\n        Could be the number of entries in the trace chain as well, is this relationship implicit or explicit?\n        +4 Filename string offset\n        The offset is relative to the start of the filename strings\n        +4 Filename string number of characters\n        Does not include the end-of-string character\n        +4 Unknown (Flags?)\n".format(filemetricssize))
+			prefetchmarkers.append("\n+{} File metrics array [{} entries]\n    Each entry (+20) contains:\n        +4 Unknown (Prefetch start time in ms?)\n        Could be the index into the trace chain array as well, is this relationship implicit or explicit?\n        +4 Unknown (Prefetch duration in ms?)\n        Could be the number of entries in the trace chain as well, is this relationship implicit or explicit?\n        +4 Filename string offset\n        The offset is relative to the start of the filename strings\n        +4 Filename string number of characters\n        Does not include the end-of-string character\n        +4 Unknown (Flags?)\n".format(filemetricssize, numberoffilemetricsentries))
 
 			tracechainssize = numberoftracechainsentries * 12
 			tracechains = [[1, tracechainssize]]
 
-			prefetchmarkers.append("\n+{} Trace chains array\n".format(tracechainssize)+sharedTraceChainsByVer172326)
+			prefetchmarkers.append("\n+{} Trace chains array [{} entries]\n".format(tracechainssize, numberoftracechainsentries)+sharedTraceChainsByVer172326)
 
 		case "17000000":
 			# Was Vista or 7 > PFV 23
@@ -89,10 +86,10 @@ def prefetchTemplate(file_path):
 			prefetchmarkers.append("\n+80 Unknown (Empty values)\n")
 			filemetricssize = numberoffilemetricsentries * 32
 			filemetrics = [[1, filemetricssize]]
-			prefetchmarkers.append("\n+{} File metrics array\n".format(filemetricssize)+sharedFileMetricsByVer232630)
+			prefetchmarkers.append("\n+{} File metrics array [{} entries]\n".format(filemetricssize, numberoffilemetricsentries)+sharedFileMetricsByVer232630)
 			tracechainssize = numberoftracechainsentries * 12
 			tracechains = [[1, tracechainssize]]
-			prefetchmarkers.append("\n+{} Trace chains array\n".format(tracechainssize)+sharedTraceChainsByVer172326)
+			prefetchmarkers.append("\n+{} Trace chains array [{} entries]\n".format(tracechainssize, numberoftracechainsentries)+sharedTraceChainsByVer172326)
 
 		case "1A000000":
 			# Was 8.1 > PFV 26
@@ -107,10 +104,10 @@ def prefetchTemplate(file_path):
 			prefetchmarkers.append("\n+88 Unknown (Empty values)\n")
 			filemetricssize = numberoffilemetricsentries * 32
 			filemetrics = [[1, filemetricssize]]
-			prefetchmarkers.append("\n+{} File metrics array\n".format(filemetricssize)+sharedFileMetricsByVer232630)
+			prefetchmarkers.append("\n+{} File metrics array [{} entries]\n".format(filemetricssize, numberoffilemetricsentries)+sharedFileMetricsByVer232630)
 			tracechainssize = numberoftracechainsentries * 12
 			tracechains = [[1, tracechainssize]]
-			prefetchmarkers.append("\n+{} Trace chains array\n".format(tracechainssize)+sharedTraceChainsByVer172326)
+			prefetchmarkers.append("\n+{} Trace chains array [{} entries]\n".format(tracechainssize, numberoftracechainsentries)+sharedTraceChainsByVer172326)
 
 		case "1E000000":
 			# Was 10 or 11 > PFV 30
@@ -153,7 +150,7 @@ def prefetchTemplate(file_path):
 				prefetchmarkers.append("\n+84 Unknown (Empty values)\n")
 			filemetricssize = numberoffilemetricsentries * 32
 			filemetrics = [[1, filemetricssize]]
-			prefetchmarkers.append("\n+{} File metrics array\n".format(filemetricssize)+sharedFileMetricsByVer232630)
+			prefetchmarkers.append("\n+{} File metrics array [{} entries]\n".format(filemetricssize, numberoffilemetricsentries)+sharedFileMetricsByVer232630)
 
 			if hashstringexists:
 				hashstringoffsetlocation = fileheadersize + fileinfosize - 76 - 4 - 4
@@ -164,7 +161,7 @@ def prefetchTemplate(file_path):
 			tracechainssize = numberoftracechainsentries * 8
 			tracechains = [[1, tracechainssize]]
 			
-			prefetchmarkers.append("\n+{} Trace chains array\n\n    Each entry (+8) contains:\n        +4 Total block load count\n        Total number of blocks loaded (or fetched)\n        The block size 512k (512 * 1024) bytes\n        +1 Unknown\n        Seen: 0x02, 0x03, 0x04, 0x08, 0x0A\n        +1 Unknown (Sample duration in ms?)\n        Seen: 0x01\n        +2 Unknown\n        Seen: 0x0001, 0xFFFF\n".format(tracechainssize))
+			prefetchmarkers.append("\n+{} Trace chains array [{} entries]\n    Each entry (+8) contains:\n        +4 Total block load count\n        Total number of blocks loaded (or fetched)\n        The block size 512k (512 * 1024) bytes\n        +1 Unknown\n        Seen: 0x02, 0x03, 0x04, 0x08, 0x0A\n        +1 Unknown (Sample duration in ms?)\n        Seen: 0x01\n        +2 Unknown\n        Seen: 0x0001, 0xFFFF\n".format(tracechainssize, numberoftracechainsentries))
 
 	sumtilltracechains = fileheadersize + fileinfosize + filemetricssize + tracechainssize	
 	sumtillfilenamestrings = filenamestringssize + filenamestringsoffset
