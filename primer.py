@@ -1,6 +1,5 @@
 import binascii
 import re
-from colors import color_dict
 
 def colorBytes(data, col, pos, howmany):
 	return data[:pos] + [col] + data[pos:pos + howmany - 1] + ["[/color]"] + data[pos + howmany - 1:]

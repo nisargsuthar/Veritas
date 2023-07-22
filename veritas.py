@@ -1,10 +1,4 @@
-import os, sys
-import binascii
-import kivy
-import webbrowser
-import loader
-from loader import *
-from primer import *
+import os, sys, binascii, webbrowser, loader
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.properties import ObjectProperty

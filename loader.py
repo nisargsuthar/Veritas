@@ -1,5 +1,6 @@
+import itertools
 from prefetch import *
-from primer import *
+from colors import *
 
 #######################################################################################################
 	# TODO: #
@@ -36,18 +37,18 @@ def loadFile(file_path, bytecount, callback, popup):
 		markerdatasize = len(markerdata)
 		asciidata = escapeMarkup(asciidata)
 		savecolor = []
-		for color in color_dict:
-			# templatedata list is reversed to avoid the template offsets being changed after injection of color tags. Instead of computing new offsets and reduce performance, tag injection is done in reverse to maintain original offsets.
-			for pair in reversed(templatedata):
-				# Injecting the [color=XXXXXX] & [/color] Kivy tags around the template section. 
-				hexdata = colorBytes(hexdata, color_dict[color], pair[0] - 1, pair[1] + 1)
-				asciidata = colorBytes(asciidata, color_dict[color], pair[0] - 1, pair[1] + 1)
-				# Save the color order for processing markerdata later.
-				savecolor.append(color)
-				# Remove the last section for which color tags were just injected.
-				del templatedata[-1]
-				# Breaking to release the control to the outer loop.
-				break
+		# Making an infinite iterator for color_dict so in case templatedata requires more colors than present in the dictionary, it can loop through it indefinitely.
+		color_cycle = itertools.cycle(color_dict.keys())
+		# templatedata list is reversed to avoid the template offsets being changed after injection of color tags. Instead of computing new offsets and reduce performance, tag injection is done in reverse to maintain original offsets.
+		for pair in reversed(templatedata):
+			color = next(color_cycle)
+			# Injecting the [color=XXXXXX] & [/color] Kivy tags around the template section. 
+			hexdata = colorBytes(hexdata, color_dict[color], pair[0] - 1, pair[1] + 1)
+			asciidata = colorBytes(asciidata, color_dict[color], pair[0] - 1, pair[1] + 1)
+			# Save the color order for processing markerdata later.
+			savecolor.append(color)
+			# Remove the last section for which color tags were just injected.
+			del templatedata[-1]
 		# Reversing the saved colors to sync the parity between the color dictionary and saved colors so the injection process can be repeated in reverse again for the same reason of maintaining original indices.
 		savecolor = reversed(savecolor)
 		i = 0
