@@ -1,18 +1,19 @@
-from kivy.config import Config
-Config.set('graphics', 'window_state', 'maximized')
-from loader import *
-from primer import *
+import os, sys
 import binascii
 import kivy
 import webbrowser
 import loader
-import os
+from loader import *
+from primer import *
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.properties import ObjectProperty
 from kivy.uix.filechooser import FileChooserListView
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
+from kivy.resources import resource_add_path, resource_find
+from kivy.config import Config
+Config.set('graphics', 'window_state', 'maximized')
 
 class MyWidget(Widget):
 	firstrv = ObjectProperty(None)
@@ -40,18 +41,16 @@ class MyWidget(Widget):
 			self.ids.firstrv.data = first_data
 			self.ids.secondrv.data = second_data
 
-			# self.ids.openfile.size_hint_x = 0
 			self.ids.openfile.opacity = 0
 			self.ids.openfile.disabled = True
 
 			self.ids.closefile.disabled = False
-			# self.ids.closefile.size_hint_x = 1
 			self.ids.closefile.opacity = 1
 			popup.dismiss()			
 		else:
 			content_label = Label(
 				text='Artifact not supported yet!\n\n'
-					 'Check [ref=supported_artifacts][u]supported artifacts[/u][/ref] here.',
+					 'Check supported artifacts [ref=supported_artifacts][u]here[/u][/ref].',
 				font_size='24sp',
 				markup=True,
 				halign='center',
@@ -74,11 +73,9 @@ class MyWidget(Widget):
 
 		self.ids.closefile.disabled = True
 		self.ids.closefile.opacity = 0
-		# self.ids.closefile.size_hint_x = 0
 
 		self.ids.openfile.disabled = False
 		self.ids.openfile.opacity = 1
-		# self.ids.openfile.size_hint_x = 1
 
 	def on_link_press(self, instance, ref):
 		if ref == 'supported_artifacts':
@@ -90,4 +87,6 @@ class Veritas(App):
 		return MyWidget()
 
 if __name__ == '__main__':
+	if hasattr(sys, '_MEIPASS'):
+		resource_add_path(os.path.join(sys._MEIPASS))
 	Veritas().run()

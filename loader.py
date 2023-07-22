@@ -73,16 +73,16 @@ def loadFile(file_path, bytecount, callback, popup):
 		# 39 00 34 00 38 00 37 00 43 00 34 00 00 00 00 00
 		# 00 00 00 00 00 00 00 00 00 00 00 00 [/color][color=01C5BB]01 00 00 00
 
-		# Each newline can either begin from a residual end color tag from previous section in which case seek out those 8 characters, or it can begin from an ongoing section for which the newline broke continuity of the color tags in which case new [color=XXXXXX] tags must be added to the beginning of the line. Since Kivy doesn't mind missing closing tags, there's no need to add [/color] at the ends before the newline character.
+		# Each newline can either begin from a residual end color tag from previous section in which case seek out those 8 characters, or it can begin from an ongoing section for which the newline broke continuity of the color tags in which case new [color=XXXXXX] tags must be added to the beginning of the line. Since Kivy doesn't mind missing closing tags, there's no need to add [/color] at the ends before the newline character. Moreover, all [/color] tags are removed for hexdata and asciidata for clean debugging process. markerdata still requires the closing tags in order to split on them.
 
 		# Results after fixing:
-		# [color=0AC92B]1E 00 00 00 [/color][color=218868]53 43 43 41 [/color][color=302B54]11 00 00 00 [/color][color=4682B4]D6 0E 00 00
+		# [color=0AC92B]1E 00 00 00 [color=218868]53 43 43 41 [color=302B54]11 00 00 00 [color=4682B4]D6 0E 00 00
 		# [color=228B22]4F 00 70 00 2D 00 4D 00 53 00 45 00 44 00 47 00
 		# [color=228B22]45 00 2E 00 45 00 58 00 45 00 2D 00 42 00 35 00
 		# [color=228B22]39 00 34 00 38 00 37 00 43 00 34 00 00 00 00 00
-		# [color=228B22]00 00 00 00 00 00 00 00 00 00 00 00 [/color][color=01C5BB]01 00 00 00
-		hexdata = fixHex(hexdata)
-		asciidata = fixAscii(asciidata)
+		# [color=228B22]00 00 00 00 00 00 00 00 00 00 00 00 [color=01C5BB]01 00 00 00
+		hexdata = fixColorTags(hexdata)
+		asciidata = fixColorTags(asciidata)
 
 		# Combine offset, hex and ascii for a single RecycleView so they share common scrolling.
 		for o, h, a in zip(offsetdata, hexdata.split("\n"), asciidata.split("\n")):
