@@ -47,12 +47,12 @@ For issues/discussions regarding the project, kindly join the [Digital Forensics
 * TODO: Finish popups.
 
 ## Supported Artifacts
-| NTOS                        | Images          | Documents       |
-|-----------------------------|-----------------|-----------------|
-| :white_check_mark: Prefetch | :clipboard: PNG | :clipboard: PDF |
-| :construction: Registry     | :clipboard: JPG |                 |
-| :clipboard: MFT             | :clipboard: BMP |                 |
-|                             | :clipboard: GIF |                 |
+| NTOS                        | Images          | Documents       | Databases                |
+|-----------------------------|-----------------|-----------------|--------------------------|
+| :white_check_mark: Prefetch | :clipboard: PNG | :clipboard: PDF | :construction: SQLite    |
+| :construction: Registry     | :clipboard: JPG |                 |                          |
+| :clipboard: MFT             | :clipboard: BMP |                 |                          |
+|                             | :clipboard: GIF |                 |                          |
 
 ## Requirements
 * Python >= 3.10.4
@@ -73,9 +73,5 @@ python3 -m venv veritas
 python3 -m pip install "kivy[base]"
 ```
 
-## Special Thanks
-* [Gary Kessler](https://www.linkedin.com/in/garykessler)'s [File Signatures Table](https://www.garykessler.net/library/file_sigs.html), for the very handy cheatsheet for various file signatures.
-* [Andrew Rathbun](https://twitter.com/bunsofwrath12)'s [DFIRArtifactMuseum](https://github.com/AndrewRathbun/DFIRArtifactMuseum), for providing numerous artifact samples to validate proper parsing.
-* [Forensics Wiki](https://forensicswiki.xyz/page/Main_Page), for additional information on file structures.
-* [Joachim Metz](https://github.com/joachimmetz)'s [Libscaa](https://github.com/libyal/libscca), for the prefetch file structure documentation.
-* [el3phanten](https://github.com/el3), for invaluable assistance in kivy.
+## Special Thanks (Check [RESOURCES.md](https://github.com/nisargsuthar/Veritas/blob/main/RESOURCES.md) for more)
+[Andrew Rathbun](https://twitter.com/bunsofwrath12), [el3phanten](https://github.com/el3), [Gary Kessler](https://www.linkedin.com/in/garykessler), [Joachim Metz](https://github.com/joachimmetz), [Forensics Wiki](https://forensics.wiki/)
