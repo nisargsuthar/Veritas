@@ -67,12 +67,12 @@ def prefetchTemplate(file_path):
 			
 			filemetricssize = numberoffilemetricsentries * 20
 			filemetrics = [[1, filemetricssize]]
-			prefetchmarkers.append("\n+{} File metrics array [{} entries]\n    Each entry (+20) contains:\n        +4 Unknown (Prefetch start time in ms?)\n        Could be the index into the trace chain array as well, is this relationship implicit or explicit?\n        +4 Unknown (Prefetch duration in ms?)\n        Could be the number of entries in the trace chain as well, is this relationship implicit or explicit?\n        +4 Filename string offset\n        The offset is relative to the start of the filename strings\n        +4 Filename string number of characters\n        Does not include the end-of-string character\n        +4 Unknown (Flags?)\n".format(filemetricssize, numberoffilemetricsentries))
+			prefetchmarkers.append(f"\n+{filemetricssize} File metrics array [{numberoffilemetricsentries} entries]\n    Each entry (+20) contains:\n        +4 Unknown (Prefetch start time in ms?)\n        Could be the index into the trace chain array as well, is this relationship implicit or explicit?\n        +4 Unknown (Prefetch duration in ms?)\n        Could be the number of entries in the trace chain as well, is this relationship implicit or explicit?\n        +4 Filename string offset\n        The offset is relative to the start of the filename strings\n        +4 Filename string number of characters\n        Does not include the end-of-string character\n        +4 Unknown (Flags?)\n")
 
 			tracechainssize = numberoftracechainsentries * 12
 			tracechains = [[1, tracechainssize]]
 
-			prefetchmarkers.append("\n+{} Trace chains array [{} entries]\n".format(tracechainssize, numberoftracechainsentries)+sharedTraceChainsByVer172326)
+			prefetchmarkers.append(f"\n+{tracechainssize} Trace chains array [{numberoftracechainsentries} entries]\n".join(sharedTraceChainsByVer172326))
 
 		case "17000000":
 			# Was Vista or 7 > PFV 23
@@ -86,10 +86,10 @@ def prefetchTemplate(file_path):
 			prefetchmarkers.append("\n+80 Unknown (Empty values)\n")
 			filemetricssize = numberoffilemetricsentries * 32
 			filemetrics = [[1, filemetricssize]]
-			prefetchmarkers.append("\n+{} File metrics array [{} entries]\n".format(filemetricssize, numberoffilemetricsentries)+sharedFileMetricsByVer232630)
+			prefetchmarkers.append(f"\n+{filemetricssize} File metrics array [{numberoffilemetricsentries} entries]\n".join(sharedFileMetricsByVer232630))
 			tracechainssize = numberoftracechainsentries * 12
 			tracechains = [[1, tracechainssize]]
-			prefetchmarkers.append("\n+{} Trace chains array [{} entries]\n".format(tracechainssize, numberoftracechainsentries)+sharedTraceChainsByVer172326)
+			prefetchmarkers.append(f"\n+{tracechainssize} Trace chains array [{numberoftracechainsentries} entries]\n".join(sharedTraceChainsByVer172326))
 
 		case "1A000000":
 			# Was 8.1 > PFV 26
@@ -104,10 +104,10 @@ def prefetchTemplate(file_path):
 			prefetchmarkers.append("\n+88 Unknown (Empty values)\n")
 			filemetricssize = numberoffilemetricsentries * 32
 			filemetrics = [[1, filemetricssize]]
-			prefetchmarkers.append("\n+{} File metrics array [{} entries]\n".format(filemetricssize, numberoffilemetricsentries)+sharedFileMetricsByVer232630)
+			prefetchmarkers.append(f"\n+{filemetricssize} File metrics array [{numberoffilemetricsentries} entries]\n".join(sharedFileMetricsByVer232630))
 			tracechainssize = numberoftracechainsentries * 12
 			tracechains = [[1, tracechainssize]]
-			prefetchmarkers.append("\n+{} Trace chains array [{} entries]\n".format(tracechainssize, numberoftracechainsentries)+sharedTraceChainsByVer172326)
+			prefetchmarkers.append(f"\n+{tracechainssize} Trace chains array [{numberoftracechainsentries} entries]\n".join(sharedTraceChainsByVer172326))
 
 		case "1E000000":
 			# Was 10 or 11 > PFV 30
@@ -150,7 +150,7 @@ def prefetchTemplate(file_path):
 				prefetchmarkers.append("\n+84 Unknown (Empty values)\n")
 			filemetricssize = numberoffilemetricsentries * 32
 			filemetrics = [[1, filemetricssize]]
-			prefetchmarkers.append("\n+{} File metrics array [{} entries]\n".format(filemetricssize, numberoffilemetricsentries)+sharedFileMetricsByVer232630)
+			prefetchmarkers.append(f"\n+{filemetricssize} File metrics array [{numberoffilemetricsentries} entries]\n".join(sharedFileMetricsByVer232630))
 
 			if hashstringexists:
 				hashstringoffsetlocation = fileheadersize + fileinfosize - 76 - 4 - 4
@@ -161,7 +161,7 @@ def prefetchTemplate(file_path):
 			tracechainssize = numberoftracechainsentries * 8
 			tracechains = [[1, tracechainssize]]
 			
-			prefetchmarkers.append("\n+{} Trace chains array [{} entries]\n    Each entry (+8) contains:\n        +4 Total block load count\n        Total number of blocks loaded (or fetched)\n        The block size 512k (512 * 1024) bytes\n        +1 Unknown\n        Seen: 0x02, 0x03, 0x04, 0x08, 0x0A\n        +1 Unknown (Sample duration in ms?)\n        Seen: 0x01\n        +2 Unknown\n        Seen: 0x0001, 0xFFFF\n".format(tracechainssize, numberoftracechainsentries))
+			prefetchmarkers.append(f"\n+{tracechainssize} Trace chains array [{numberoftracechainsentries} entries]\n    Each entry (+8) contains:\n        +4 Total block load count\n        Total number of blocks loaded (or fetched)\n        The block size 512k (512 * 1024) bytes\n        +1 Unknown\n        Seen: 0x02, 0x03, 0x04, 0x08, 0x0A\n        +1 Unknown (Sample duration in ms?)\n        Seen: 0x01\n        +2 Unknown\n        Seen: 0x0001, 0xFFFF\n")
 
 	sumtilltracechains = fileheadersize + fileinfosize + filemetricssize + tracechainssize	
 	sumtillfilenamestrings = filenamestringssize + filenamestringsoffset
@@ -175,12 +175,12 @@ def prefetchTemplate(file_path):
 	hashstringorfilenamestringspadding = [[1, hashstringorfilenamestringspaddingsize]]
 	volumeinformation = [[1, volumesinformationsize]]
 
-	prefetchmarkers.append("\n+{} File name strings\n".format(filenamestringssize))
+	prefetchmarkers.append(f"\n+{filenamestringssize} File name strings\n")
 	if hashstringexists:
-		prefetchmarkers.append("\n+{} Hash string\nApplication Prefetch > Path to executable responsible for the generated prefetch file.\nApplication Hosting Prefetch > Package name of hosted application.\n".format(hashstringsize))
+		prefetchmarkers.append(f"\n+{hashstringsize} Hash string\nApplication Prefetch > Path to executable responsible for the generated prefetch file.\nApplication Hosting Prefetch > Package name of hosted application.\n")
 	if hashstringorfilenamestringspaddingsize != 0:
-		prefetchmarkers.append("\n+{} Padding\n".format(hashstringorfilenamestringspaddingsize))
-	prefetchmarkers.append("\n+{} Volume information\n".format(volumesinformationsize))
+		prefetchmarkers.append(f"\n+{hashstringorfilenamestringspaddingsize} Padding\n")
+	prefetchmarkers.append(f"\n+{volumesinformationsize} Volume information\n")
 
 	prefetchtemplate.append(fileheader)
 	prefetchtemplate.append(fileinfo)

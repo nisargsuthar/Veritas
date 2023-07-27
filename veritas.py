@@ -30,7 +30,7 @@ class MyWidget(Widget):
 	def updateRecycleViews(self, first_data, second_data, artifactsupported, file_path, popup):
 		if artifactsupported:
 			app = App.get_running_app()
-			app.title = "Veritas - [{}]".format(file_path)
+			app.title = f"Veritas - [{file_path}]"
 
 			self.ids.firstrv.data = first_data
 			self.ids.secondrv.data = second_data

@@ -1,5 +1,5 @@
 import itertools
-from prefetch import *
+from artifacts.prefetch import *
 from colors import *
 
 #######################################################################################################
@@ -89,7 +89,7 @@ def loadFile(file_path, bytecount, callback, popup):
 		for o, h, a in zip(offsetdata, hexdata.split("\n"), asciidata.split("\n")):
 			first.append(joinOffsetHexAscii(o, h, a))
 		# Again leveraging Kivy not minding missing closing color tags, markerdata is split on it.
-		second = [{"text": "{}".format(line)} for line in markerdata.split("[/color]")]
+		second = [{"text": "f{line}"} for line in markerdata.split("[/color]")]
 		callback(first, second, artifactsupported, file_path, popup)
 #######################################################################################################
 
