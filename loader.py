@@ -60,7 +60,7 @@ def loadFile(file_path, bytecount, callback, popup):
 				break
 		# Making hexadecimal uppercase and adding spaces every byte representation in list if length of the representation is 2.
 		# This excludes both the color tags, and byte representations with a newline appended to them.
-		hexdata = [s.upper()+" " if len(s) == 2 else s for s in hexdata]
+		hexdata = [l.upper()+" " if len(l) == 2 else l for l in hexdata]
 									
 		hexdata = listToString(hexdata)
 		asciidata = listToString(asciidata)
@@ -89,7 +89,7 @@ def loadFile(file_path, bytecount, callback, popup):
 		for o, h, a in zip(offsetdata, hexdata.split("\n"), asciidata.split("\n")):
 			first.append(joinOffsetHexAscii(o, h, a))
 		# Again leveraging Kivy not minding missing closing color tags, markerdata is split on it.
-		second = [{"text": "f{line}"} for line in markerdata.split("[/color]")]
+		second = [{"text": f"{line}"} for line in markerdata.split("[/color]")]
 		callback(first, second, artifactsupported, file_path, popup)
 #######################################################################################################
 

@@ -18,8 +18,8 @@ def escapeMarkup(data):
 			escaped_data.append(c)
 	return escaped_data
 
-def listToString(s):
-	return ''.join([str(char) for char in s])
+def listToString(l):
+	return ''.join([str(char) for char in l])
 
 def readPartialFile(file_path, numberofbytestoread):
 	with open(file_path, 'rb') as f:
@@ -50,7 +50,7 @@ def readFile(file_path):
 	return formattedhexdata, formattedasciidata, hexdata
 
 def joinOffsetHexAscii(offsetdata, hexdata, asciidata):
-			return {"offsettext": offsetdata, "hextext": hexdata, "asciitext": asciidata}
+	return {"offsettext": offsetdata, "hextext": hexdata, "asciitext": asciidata}
 
 def getOffsets(bytecount):
 	bytecount += 16 if bytecount % 16 != 0 else 0

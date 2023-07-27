@@ -72,7 +72,7 @@ def prefetchTemplate(file_path):
 			tracechainssize = numberoftracechainsentries * 12
 			tracechains = [[1, tracechainssize]]
 
-			prefetchmarkers.append(f"\n+{tracechainssize} Trace chains array [{numberoftracechainsentries} entries]\n".join(sharedTraceChainsByVer172326))
+			prefetchmarkers.append(f"\n+{tracechainssize} Trace chains array [{numberoftracechainsentries} entries]\n".join([sharedTraceChainsByVer172326]))
 
 		case "17000000":
 			# Was Vista or 7 > PFV 23
@@ -86,10 +86,10 @@ def prefetchTemplate(file_path):
 			prefetchmarkers.append("\n+80 Unknown (Empty values)\n")
 			filemetricssize = numberoffilemetricsentries * 32
 			filemetrics = [[1, filemetricssize]]
-			prefetchmarkers.append(f"\n+{filemetricssize} File metrics array [{numberoffilemetricsentries} entries]\n".join(sharedFileMetricsByVer232630))
+			prefetchmarkers.append(f"\n+{filemetricssize} File metrics array [{numberoffilemetricsentries} entries]\n".join([sharedFileMetricsByVer232630]))
 			tracechainssize = numberoftracechainsentries * 12
 			tracechains = [[1, tracechainssize]]
-			prefetchmarkers.append(f"\n+{tracechainssize} Trace chains array [{numberoftracechainsentries} entries]\n".join(sharedTraceChainsByVer172326))
+			prefetchmarkers.append(f"\n+{tracechainssize} Trace chains array [{numberoftracechainsentries} entries]\n".join([sharedTraceChainsByVer172326]))
 
 		case "1A000000":
 			# Was 8.1 > PFV 26
@@ -104,10 +104,10 @@ def prefetchTemplate(file_path):
 			prefetchmarkers.append("\n+88 Unknown (Empty values)\n")
 			filemetricssize = numberoffilemetricsentries * 32
 			filemetrics = [[1, filemetricssize]]
-			prefetchmarkers.append(f"\n+{filemetricssize} File metrics array [{numberoffilemetricsentries} entries]\n".join(sharedFileMetricsByVer232630))
+			prefetchmarkers.append(f"\n+{filemetricssize} File metrics array [{numberoffilemetricsentries} entries]\n".join([sharedFileMetricsByVer232630]))
 			tracechainssize = numberoftracechainsentries * 12
 			tracechains = [[1, tracechainssize]]
-			prefetchmarkers.append(f"\n+{tracechainssize} Trace chains array [{numberoftracechainsentries} entries]\n".join(sharedTraceChainsByVer172326))
+			prefetchmarkers.append(f"\n+{tracechainssize} Trace chains array [{numberoftracechainsentries} entries]\n".join([sharedTraceChainsByVer172326]))
 
 		case "1E000000":
 			# Was 10 or 11 > PFV 30
@@ -150,7 +150,7 @@ def prefetchTemplate(file_path):
 				prefetchmarkers.append("\n+84 Unknown (Empty values)\n")
 			filemetricssize = numberoffilemetricsentries * 32
 			filemetrics = [[1, filemetricssize]]
-			prefetchmarkers.append(f"\n+{filemetricssize} File metrics array [{numberoffilemetricsentries} entries]\n".join(sharedFileMetricsByVer232630))
+			prefetchmarkers.append(f"\n+{filemetricssize} File metrics array [{numberoffilemetricsentries} entries]\n".join([sharedFileMetricsByVer232630]))
 
 			if hashstringexists:
 				hashstringoffsetlocation = fileheadersize + fileinfosize - 76 - 4 - 4

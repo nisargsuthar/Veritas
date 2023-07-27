@@ -1,16 +1,16 @@
-def toAbsolute(listofpairlist, listofsizes):
-	for sizeindex in range(1, len(listofsizes)):
+def toAbsolute(template, sizes):
+	for sizeindex in range(1, len(sizes)):
 		# Convert sequential sizes to cumulative.
-		listofsizes[sizeindex] += listofsizes[sizeindex-1]
+		sizes[sizeindex] += sizes[sizeindex-1]
 	
-	for vi in range(1, len(listofpairlist)):
+	for vi in range(1, len(template)):
 		# Add size of previous section to the relative offset.
-		for pair in listofpairlist[vi]:
-			pair[0] += listofsizes[vi-1]
+		for pair in template[vi]:
+			pair[0] += sizes[vi-1]
 	
 	returnlist = []
-	for l in range(len(listofpairlist)):
-		returnlist += listofpairlist[l]
+	for l in range(len(template)):
+		returnlist += template[l]
 	
 	return returnlist
 
