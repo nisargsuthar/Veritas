@@ -19,11 +19,8 @@ class MyWidget(Widget):
 	def openFile(self):
 		file_path = filechooser.open_file(multiple=False)
 		if file_path:
-			self.loadFileCallback(file_path[0])
-
-	def loadFileCallback(self, file_path):
-		bytecount = os.path.getsize(file_path)
-		loader.loadFile(file_path, bytecount, self.updateRecycleViews)
+			bytecount = os.path.getsize(file_path[0])
+			loader.loadFile(file_path[0], bytecount, self.updateRecycleViews)
 
 	def updateRecycleViews(self, first_data, second_data, artifactsupported, file_path):
 		if artifactsupported:
