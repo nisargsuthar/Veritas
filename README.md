@@ -43,8 +43,6 @@ For issues/discussions regarding the project, kindly join the [Digital Forensics
 ## Features
 * Dynamic artifact templates.
 * Color coded artifact file structure with sub-sections.
-* TODO: Multiple tabs.
-* TODO: Finish popups.
 
 ## Supported Artifacts
 | NTOS                        | Images          | Documents       | Databases                |
@@ -57,20 +55,26 @@ For issues/discussions regarding the project, kindly join the [Digital Forensics
 ## Requirements
 * Python >= 3.10.4
 * Kivy >= 2.1.0
+* Plyer >= 2.1.0
 
 ## Installation
 **Step 1**: Create a virtual environment using:
 ```python
-python3 -m venv veritas
+python.exe -m venv veritas
 ```
 
 **Step 2**: Depending on your OS, activate the virtual environment using:
 * Windows: `.\veritas\Scripts\activate`
 * Linux: `source veritas/Scripts/activate`
 
-**Step 3**: Install kivy using:
+**Step 3**: Install Kivy using:
 ```python
-python3 -m pip install "kivy[base]"
+python.exe -m pip install "kivy[base]"
+```
+
+**Step 4**: Install Plyer using:
+```python
+python.exe -m pip install plyer
 ```
 
 ## Special Thanks (Check [RESOURCES.md](https://github.com/nisargsuthar/Veritas/blob/main/RESOURCES.md) for more)

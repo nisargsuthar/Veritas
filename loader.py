@@ -6,7 +6,7 @@ from colors import *
 	# TODO: #
 	#########
 
-def loadFile(file_path, bytecount, callback, popup):
+def loadFile(file_path, bytecount, callback):
 	first = []
 	second = []
 	offsetdata = getOffsets(int(bytecount))
@@ -31,7 +31,7 @@ def loadFile(file_path, bytecount, callback, popup):
 		artifactsupported = True
 		hexdata, asciidata, templatedata, markerdata = registryTemplate(file_path)
 	else:
-		callback(first, second, artifactsupported, file_path, popup)
+		callback(first, second, artifactsupported, file_path)
 
 	if artifactsupported:
 		markerdatasize = len(markerdata)
@@ -89,7 +89,7 @@ def loadFile(file_path, bytecount, callback, popup):
 			first.append(joinOffsetHexAscii(o, h, a))
 		# Again leveraging Kivy not minding missing closing color tags, markerdata is split on it.
 		second = [{"text": f"{line}"} for line in markerdata.split("[/color]")]
-		callback(first, second, artifactsupported, file_path, popup)
+		callback(first, second, artifactsupported, file_path)
 #######################################################################################################
 
 def isPrefetch(hexdata):

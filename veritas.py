@@ -1,8 +1,8 @@
 import os, sys, binascii, webbrowser, loader
+from plyer import filechooser
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.properties import ObjectProperty
-from kivy.uix.filechooser import FileChooserListView
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
 from kivy.resources import resource_add_path, resource_find
@@ -17,17 +17,15 @@ class MyWidget(Widget):
 		super(MyWidget, self).__init__(**kwargs)
 
 	def openFile(self):
-		self.file_chooser = FileChooserListView(path='.')
-		popup = Popup(title='Choose a file', content=self.file_chooser, size_hint=(0.9, 0.9))
-		self.file_chooser.bind(on_submit=lambda instance, value, *args: self.loadFileCallback(value[0], popup))
-		popup.open()
-
-	def loadFileCallback(self, file_path, popup):
+		file_path = filechooser.open_file(multiple=False)
 		if file_path:
-			bytecount = os.path.getsize(file_path)
-			loader.loadFile(file_path, bytecount, self.updateRecycleViews, popup)
+			self.loadFileCallback(file_path[0])
 
-	def updateRecycleViews(self, first_data, second_data, artifactsupported, file_path, popup):
+	def loadFileCallback(self, file_path):
+		bytecount = os.path.getsize(file_path)
+		loader.loadFile(file_path, bytecount, self.updateRecycleViews)
+
+	def updateRecycleViews(self, first_data, second_data, artifactsupported, file_path):
 		if artifactsupported:
 			app = App.get_running_app()
 			app.title = f"Veritas - [{file_path}]"
@@ -40,7 +38,6 @@ class MyWidget(Widget):
 
 			self.ids.closefile.disabled = False
 			self.ids.closefile.opacity = 1
-			popup.dismiss()			
 		else:
 			content_label = Label(
 				text='Artifact not supported yet!\n\n'
