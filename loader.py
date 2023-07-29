@@ -60,7 +60,6 @@ def loadFile(file_path, bytecount, callback, popup):
 				break
 		# Making hexadecimal uppercase and adding spaces every byte representation in list if length of the representation is 2.
 		# This excludes both the color tags, and byte representations with a newline appended to them.
-		hexdata = [l.upper()+" " if len(l) == 2 else l for l in hexdata]
 									
 		hexdata = listToString(hexdata)
 		asciidata = listToString(asciidata)
@@ -74,7 +73,7 @@ def loadFile(file_path, bytecount, callback, popup):
 		# 39 00 34 00 38 00 37 00 43 00 34 00 00 00 00 00
 		# 00 00 00 00 00 00 00 00 00 00 00 00 [/color][color=01C5BB]01 00 00 00
 
-		# Each newline can either begin from a residual end color tag from previous section in which case seek out those 8 characters, or it can begin from an ongoing section for which the newline broke continuity of the color tags in which case new [color=XXXXXX] tags must be added to the beginning of the line. Since Kivy doesn't mind missing closing tags, there's no need to add [/color] at the ends before the newline character. Moreover, all [/color] tags are removed for hexdata and asciidata for clean debugging process. markerdata still requires the closing tags in order to split on them.
+		# Each newline can either begin from a residual end color tag from previous section or it can begin from an ongoing section for which the newline broke continuity of the color tags in which case new [color=XXXXXX] tags must be added to the beginning of the line. Since Kivy doesn't mind missing closing tags, there's no need to add [/color] at the ends before the newline character. Moreover, all [/color] tags are removed for hexdata and asciidata for clean debugging process. markerdata still requires the closing tags in order to split on them.
 
 		# Results after fixing:
 		# [color=0AC92B]1E 00 00 00 [color=218868]53 43 43 41 [color=302B54]11 00 00 00 [color=4682B4]D6 0E 00 00

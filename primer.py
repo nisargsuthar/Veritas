@@ -39,12 +39,14 @@ def readFile(file_path):
 				break
 			bytecount += 1
 			asciichar = int.from_bytes(byte, "big")
-			hex_str = binascii.hexlify(byte).decode("cp1252")
+			hex_str = binascii.hexlify(byte).decode("cp1252").upper()
 			hexdata.append(hex_str)
 			ascii_str = chr(asciichar) if 32 <= asciichar <= 126 else "."
 			if bytecount % 16 == 0:
 				hex_str += "\n"
 				ascii_str += "\n"
+			else:
+				hex_str += " "
 			formattedhexdata.append(hex_str)
 			formattedasciidata.append(ascii_str)
 	return formattedhexdata, formattedasciidata, hexdata

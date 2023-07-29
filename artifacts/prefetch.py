@@ -44,16 +44,16 @@ def prefetchTemplate(file_path):
 ######################################################################
 	# VERSION SPECIFIC. #
 	#####################
-	version = "".join(hexdata[b] for b in range(4)).upper()
-	filemetricsoffset = int(swapEndianness("".join(hexdata[b] for b in range(84 , 88)).upper()), 16)
-	numberoffilemetricsentries = int(swapEndianness("".join(hexdata[b] for b in range(88, 92)).upper()), 16)
-	numberoftracechainsentries = int(swapEndianness("".join(hexdata[b] for b in range(96, 100)).upper()), 16)
+	version = "".join(hexdata[b] for b in range(4))
+	filemetricsoffset = int(swapEndianness("".join(hexdata[b] for b in range(84 , 88))), 16)
+	numberoffilemetricsentries = int(swapEndianness("".join(hexdata[b] for b in range(88, 92))), 16)
+	numberoftracechainsentries = int(swapEndianness("".join(hexdata[b] for b in range(96, 100))), 16)
 	hashstringexists = False
 	hashstringsize = hashstringoffset = 0
-	filenamestringsoffset = int(swapEndianness("".join(hexdata[b] for b in range(100, 104)).upper()), 16)
-	filenamestringssize = int(swapEndianness("".join(hexdata[b] for b in range(104, 108)).upper()), 16)
-	volumesinformationoffset = int(swapEndianness("".join(hexdata[b] for b in range(108, 112)).upper()), 16)
-	volumesinformationsize = int(swapEndianness("".join(hexdata[b] for b in range(116, 120)).upper()), 16)
+	filenamestringsoffset = int(swapEndianness("".join(hexdata[b] for b in range(100, 104))), 16)
+	filenamestringssize = int(swapEndianness("".join(hexdata[b] for b in range(104, 108))), 16)
+	volumesinformationoffset = int(swapEndianness("".join(hexdata[b] for b in range(108, 112))), 16)
+	volumesinformationsize = int(swapEndianness("".join(hexdata[b] for b in range(116, 120))), 16)
 
 	match version:
 		case "11000000":
@@ -111,14 +111,14 @@ def prefetchTemplate(file_path):
 
 		case "1E000000":
 			# Was 10 or 11 > PFV 30
-			variant = "".join(hexdata[b] for b in range(84, 88)).upper()
+			variant = "".join(hexdata[b] for b in range(84, 88))
 			prefetchmarkers.append("\n+8 Unknown (Empty values)\n")
 			prefetchmarkers.append("\n+64 (8 * 8) Last run time(s)\nContains FILETIMEs, or 0 if not set\nThe first FILETIME is the most recent run time\n")
 
 			match variant:
 				case "30010000":
 					# Variant 1
-					hso = "".join(hexdata[b] for b in range(220, 224)).upper()
+					hso = "".join(hexdata[b] for b in range(220, 224))
 					if hso == "00000000":
 						fileinfo = [[1, 4], [5, 4], [9, 4], [13, 4], [17, 4], [21, 4], [25, 4], [29, 4], [33, 4], [37, 8], [45, 64], [109, 16], [125, 4], [129, 4], [133, 4], [137, 84]]
 					else:
@@ -131,7 +131,7 @@ def prefetchTemplate(file_path):
 					prefetchmarkers.append("\n+4 Unknown\nSeen: 0x00, 0x03\n")
 				case "28010000":
 					# Variant 2
-					hso = "".join(hexdata[b] for b in range(212, 216)).upper()
+					hso = "".join(hexdata[b] for b in range(212, 216))
 					if hso == "00000000":
 						fileinfo = [[1, 4], [5, 4], [9, 4], [13, 4], [17, 4], [21, 4], [25, 4], [29, 4], [33, 4], [37, 8], [45, 64], [109, 8], [117, 4], [121, 4], [125, 4], [129, 84]]
 					else:
@@ -155,8 +155,8 @@ def prefetchTemplate(file_path):
 			if hashstringexists:
 				hashstringoffsetlocation = fileheadersize + fileinfosize - 76 - 4 - 4
 				hashstringsizelocation = fileheadersize + fileinfosize - 76 - 4
-				hashstringoffset = int(swapEndianness("".join(hexdata[b] for b in range(hashstringoffsetlocation, hashstringoffsetlocation+4)).upper()), 16)
-				hashstringsize = int(swapEndianness("".join(hexdata[b] for b in range(hashstringsizelocation, hashstringsizelocation+4)).upper()), 16)
+				hashstringoffset = int(swapEndianness("".join(hexdata[b] for b in range(hashstringoffsetlocation, hashstringoffsetlocation+4))), 16)
+				hashstringsize = int(swapEndianness("".join(hexdata[b] for b in range(hashstringsizelocation, hashstringsizelocation+4))), 16)
 
 			tracechainssize = numberoftracechainsentries * 8
 			tracechains = [[1, tracechainssize]]
