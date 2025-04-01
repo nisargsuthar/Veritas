@@ -48,9 +48,9 @@ For issues/discussions regarding the project, kindly join the [Digital Forensics
 | NTOS                        | Images          | Documents       | Databases                |
 |-----------------------------|-----------------|-----------------|--------------------------|
 | :white_check_mark: Prefetch | :clipboard: PNG | :clipboard: PDF | :construction: SQLite    |
-| :construction: Registry     | :clipboard: JPG |                 |                          |
-| :clipboard: MFT             | :clipboard: BMP |                 |                          |
-|                             | :clipboard: GIF |                 |                          |
+| :white_check_mark: LNK      | :clipboard: JPG |                 |                          |
+| :clipboard: Registry        | :clipboard: BMP |                 |                          |
+| :clipboard: MFT             | :clipboard: GIF |                 |                          |
 
 ## Requirements
 * Python >= 3.10.4
