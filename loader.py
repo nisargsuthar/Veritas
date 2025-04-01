@@ -1,5 +1,6 @@
 import itertools
-from artifacts.prefetch import *
+from artifacts.prefetch.prefetch import *
+from artifacts.lnk.lnk import *
 from colors import *
 
 #######################################################################################################
@@ -24,12 +25,15 @@ def loadFile(file_path, bytecount, callback):
 	if isPrefetch(hexdata):
 		artifactsupported = True
 		hexdata, asciidata, templatedata, markerdata = prefetchTemplate(file_path)
-	elif isMFT(hexdata):
+	elif isLNK(hexdata):
 		artifactsupported = True
-		hexdata, asciidata, templatedata, markerdata = mftTemplate(file_path)
-	elif isRegistry(hexdata):
-		artifactsupported = True
-		hexdata, asciidata, templatedata, markerdata = registryTemplate(file_path)
+		hexdata, asciidata, templatedata, markerdata = lnkTemplate(file_path)
+	# elif isMFT(hexdata):
+	# 	artifactsupported = True
+	# 	hexdata, asciidata, templatedata, markerdata = mftTemplate(file_path)
+	# elif isRegistry(hexdata):
+	# 	artifactsupported = True
+	# 	hexdata, asciidata, templatedata, markerdata = registryTemplate(file_path)
 	else:
 		callback(first, second, artifactsupported, file_path)
 
@@ -104,6 +108,14 @@ def isPrefetch(hexdata):
 			print("Prefetch file is not compressed!")
 			return True
 		return False
+
+#######################################################################################################
+
+def isLNK(hexdata):
+	magic = "".join(hexdata[b] for b in range(4)).upper()
+	if magic == "4C000000": # L...
+		return True
+	return False
 
 #######################################################################################################
 

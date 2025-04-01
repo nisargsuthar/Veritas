@@ -66,24 +66,53 @@
         GridLayout:
             cols: 2
 
-            RecycleView:
+            BoxLayout:
+                orientation: 'vertical'
                 size_hint_x: None
                 width: 564+20+20+192+20+20+72+20+20
-                id: firstrv
-                viewclass: 'HexAsciiViewClass'
-                do_scroll: True
-                bar_width: 15
-                effect_cls: "ScrollEffect"
-                scroll_type: ["bars", "content"]
-                scroll_wheel_distance: 50
-                smooth_scroll_end: 10
-                RecycleBoxLayout:
-                    id: layout
-                    default_size: None, None
-                    default_size_hint: 1, None
+
+                BoxLayout:
+                    id: offsetheader
+                    orientation: 'horizontal'
                     size_hint_y: None
-                    height: self.minimum_height
-                    orientation: 'vertical'
+                    height: '30dp'
+                    padding: [20, 5]
+                    spacing: 10
+                    Label:
+                        text: "Offset"
+                        size_hint_x: None
+                        width: 72
+                        font_size: 20
+                        font_name: "RobotoMono-Regular"
+                    Label:
+                        text: "00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F"
+                        size_hint_x: None
+                        width: 564+20+20+20
+                        font_size: 20
+                        font_name: "RobotoMono-Regular"
+                    Label:
+                        text: "ASCII"
+                        size_hint_x: None
+                        width: 192
+                        font_size: 20
+                        font_name: "RobotoMono-Regular"
+
+                RecycleView:
+                    id: firstrv
+                    viewclass: 'HexAsciiViewClass'
+                    do_scroll: True
+                    bar_width: 15
+                    effect_cls: "ScrollEffect"
+                    scroll_type: ["bars", "content"]
+                    scroll_wheel_distance: 50
+                    smooth_scroll_end: 10
+                    RecycleBoxLayout:
+                        id: layout
+                        default_size: None, None
+                        default_size_hint: 1, None
+                        size_hint_y: None
+                        height: self.minimum_height
+                        orientation: 'vertical'
 
             RecycleView:
                 id: secondrv

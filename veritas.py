@@ -15,10 +15,13 @@ class MyWidget(Widget):
 
 	def __init__(self, **kwargs):
 		super(MyWidget, self).__init__(**kwargs)
+		self.ids.offsetheader.disabled = True
+		self.ids.offsetheader.opacity = 0
 
 	def openFile(self):
-		file_path = filechooser.open_file(multiple=False)
+		file_path = filechooser.open_file(multiple=False, filters=[["All files", "*.lnk", "*"]])
 		if file_path:
+			print(f"Selected file: {file_path[0]}")  # Debugging
 			bytecount = os.path.getsize(file_path[0])
 			loader.loadFile(file_path[0], bytecount, self.updateRecycleViews)
 
@@ -35,6 +38,9 @@ class MyWidget(Widget):
 
 			self.ids.closefile.disabled = False
 			self.ids.closefile.opacity = 1
+
+			self.ids.offsetheader.disabled = False
+			self.ids.offsetheader.opacity = 1
 		else:
 			content_label = Label(
 				text='Artifact not supported yet!\n\n'
@@ -64,6 +70,9 @@ class MyWidget(Widget):
 
 		self.ids.openfile.disabled = False
 		self.ids.openfile.opacity = 1
+
+		self.ids.offsetheader.disabled = True
+		self.ids.offsetheader.opacity = 0
 
 	def on_link_press(self, instance, ref):
 		if ref == 'supported_artifacts':
