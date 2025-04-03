@@ -19,6 +19,24 @@ def swapEndianness(hexstring):
 	ba.reverse()
 	return ba.hex()
 
+def parseIntWord(hexdata, byteoffset, swapendianness = 0):
+    value = "".join(hexdata[b] for b in range(byteoffset , byteoffset + 2))
+    if not swapendianness:
+        value = swapEndianness(value)
+    return int(value, 16)
+
+def parseIntDword(hexdata, byteoffset, swapendianness = 0):
+    value = "".join(hexdata[b] for b in range(byteoffset , byteoffset + 4))
+    if not swapendianness:
+        value = swapEndianness(value)
+    return int(value, 16)
+
+def parseIntQword(hexdata, byteoffset, swapendianness = 0):
+    value = "".join(hexdata[b] for b in range(byteoffset , byteoffset + 8))
+    if not swapendianness:
+        value = swapEndianness(value)
+    return int(value, 16)
+
 def getOffset(byteoffset):
     return f"0x{byteoffset:06X}"
 

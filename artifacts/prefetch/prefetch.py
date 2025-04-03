@@ -1,6 +1,5 @@
 # Author: Nisarg Suthar
 
-import binascii
 from primer import *
 from offsetter import *
 
@@ -45,15 +44,15 @@ def prefetchTemplate(file_path):
 	# VERSION SPECIFIC. #
 	#####################
 	version = "".join(hexdata[b] for b in range(4))
-	filemetricsoffset = int(swapEndianness("".join(hexdata[b] for b in range(84 , 88))), 16)
-	numberoffilemetricsentries = int(swapEndianness("".join(hexdata[b] for b in range(88, 92))), 16)
-	numberoftracechainsentries = int(swapEndianness("".join(hexdata[b] for b in range(96, 100))), 16)
+	filemetricsoffset = parseIntDword(hexdata, 84)
+	numberoffilemetricsentries = parseIntDword(hexdata, 88)
+	numberoftracechainsentries = parseIntDword(hexdata, 96)
 	hashstringexists = False
 	hashstringsize = hashstringoffset = 0
-	filenamestringsoffset = int(swapEndianness("".join(hexdata[b] for b in range(100, 104))), 16)
-	filenamestringssize = int(swapEndianness("".join(hexdata[b] for b in range(104, 108))), 16)
-	volumesinformationoffset = int(swapEndianness("".join(hexdata[b] for b in range(108, 112))), 16)
-	volumesinformationsize = int(swapEndianness("".join(hexdata[b] for b in range(116, 120))), 16)
+	filenamestringsoffset = parseIntDword(hexdata, 100)
+	filenamestringssize = parseIntDword(hexdata, 104)
+	volumesinformationoffset = parseIntDword(hexdata, 108)
+	volumesinformationsize = parseIntDword(hexdata, 116)
 
 	match version:
 		case "11000000":
@@ -155,8 +154,8 @@ def prefetchTemplate(file_path):
 			if hashstringexists:
 				hashstringoffsetlocation = fileheadersize + fileinfosize - 76 - 4 - 4
 				hashstringsizelocation = fileheadersize + fileinfosize - 76 - 4
-				hashstringoffset = int(swapEndianness("".join(hexdata[b] for b in range(hashstringoffsetlocation, hashstringoffsetlocation+4))), 16)
-				hashstringsize = int(swapEndianness("".join(hexdata[b] for b in range(hashstringsizelocation, hashstringsizelocation+4))), 16)
+				hashstringoffset = parseIntDword(hexdata, hashstringoffsetlocation)
+				hashstringsize = parseIntDword(hexdata, hashstringsizelocation)
 
 			tracechainssize = numberoftracechainsentries * 8
 			tracechains = [[1, tracechainssize]]

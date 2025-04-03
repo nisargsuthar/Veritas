@@ -7,15 +7,14 @@ def colorBytes(data, col, pos, howmany):
 def escapeMarkup(data):
 	escaped_data = []
 	replacements = {
-		"&": "&amp;",
-		"[": "&bl;",
-		"]": "&br;"
+		"&": "&amp;", "[": "&bl;", "]": "&br;",
+		"&\n": "&amp;\n", "[\n": "&bl;\n", "]\n": "&br;\n",
 	}
-	for c in data:
-		if c in replacements:
-			escaped_data.append(replacements[c])
+	for s in data:
+		if s in replacements:
+			escaped_data.append(replacements[s])
 		else:
-			escaped_data.append(c)
+			escaped_data.append(s)
 	return escaped_data
 
 def listToString(l):
