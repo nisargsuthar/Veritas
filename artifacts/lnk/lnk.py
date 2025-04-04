@@ -6,16 +6,18 @@ from offsetter import *
 from artifacts.lnk.classindicators import *
 from artifacts.lnk.shellguids import *
 from artifacts.lnk.netproviders import *
+from artifacts.lnk.flags import *
+from artifacts.lnk.hotkeys import *
 
 #######################################################################################################
 	# TODO: #
 	#########
-	# Replace see sections in markers
 	# Confirm if class indicator categorization is correct
 	# Parse extension blocks for root folder shell item
 	# Look into Sort Indices for root folder shell item
-	# Convert seeks to offset parsing
-	# Parse the GUIDS in extra data blocks
+	# Convert remaining seeks to offset parsing
+	# Parse the GUIDS in tracker data block
+	# Parse the serialized property storage structure in property store data block
 #######################################################################################################
 
 def lnkTemplate(file_path):
@@ -30,17 +32,15 @@ def lnkTemplate(file_path):
 	lnkmarkers.append("+4 The header size\n")
 	lnkmarkers.append("\n+16 The LNK class identifier\nGUID: {00021401-0000-0000-c000-000000000046}\n")
 
-	# Parsing data flags
+	# Parsing link flags
 	linkflagsbitstring = format(parseIntDword(hexdata, 20), '032b')
-	linkflagnames = ["HasLinkTargetIDList", "HasLinkInfo", "HasName", "HasRelativePath", "HasWorkingDir", "HasArguments", "HasIconLocation", "IsUnicode", "ForceNoLinkInfo", "HasExpString", "RunInSeparateProcess", "Unused1", "HasDarwinID", "RunAsUser", "HasExpIcon", "NoPidlAlias", "Unused2", "RunWithShimLayer", "ForceNoLinkTrack", "EnableTargetMetadata", "DisableLinkPathTracking", "DisableKnownFolderTracking", "DisableKnownFolderAlias", "AllowLinkToLink", "UnaliasOnSave", "PreferEnvironmentPath", "KeepLocalIDListForUNCTarget"]
-	linkflags = {name: int(linkflagsbitstring[31 - i]) for i, name in enumerate(linkflagnames)}
+	linkflags = getLinkFlags(linkflagsbitstring)
 	linkflagsset = "\n         ".join(name for name, value in linkflags.items() if value)
 	lnkmarkers.append(f"\n+4 Link flags\n    SET: {linkflagsset}\n")
 
 	# Parsing File Attribute Flags
 	fileattributeflagsbitstring = format(parseIntDword(hexdata, 24), '032b')
-	fileattributeflagnames = ["FILE_ATTRIBUTE_READONLY", "FILE_ATTRIBUTE_HIDDEN", "FILE_ATTRIBUTE_SYSTEM", "Reserved1", "FILE_ATTRIBUTE_DIRECTORY", "FILE_ATTRIBUTE_ARCHIVE", "Reserved2", "FILE_ATTRIBUTE_NORMAL", "FILE_ATTRIBUTE_TEMPORARY", "FILE_ATTRIBUTE_SPARSE_FILE", "FILE_ATTRIBUTE_REPARSE_POINT", "FILE_ATTRIBUTE_COMPRESSED", "FILE_ATTRIBUTE_OFFLINE", "FILE_ATTRIBUTE_NOT_CONTENT_INDEXED", "FILE_ATTRIBUTE_ENCRYTED"]
-	fileattributeflags = {name: int(fileattributeflagsbitstring[31 - i]) for i, name in enumerate(fileattributeflagnames)}
+	fileattributeflags = getFileAttributeFlags(fileattributeflagsbitstring)
 	fileattributeflagsset = "\n         ".join(name for name, value in fileattributeflags.items() if value)
 	lnkmarkers.append(f"\n+4 File attribute flags\n    SET: {fileattributeflagsset}\n")
 
@@ -55,10 +55,32 @@ def lnkTemplate(file_path):
 	lnkmarkers.append(f"\n+8 Last access date and time ({getTimeString(atime)})\n")
 	lnkmarkers.append(f"\n+8 Last modification date and time ({getTimeString(mtime)})\n")
 
-	lnkmarkers.append("\n+4 File size in bytes\nContains an unsigned integer\n")
-	lnkmarkers.append("\n+4 Icon index value\nContains a signed integer\n")
-	lnkmarkers.append("\n+4 ShowWindow value\nContains an unsigned integer\nSee section: Show Window definitions\n")
-	lnkmarkers.append("\n+2 Hot key\nSee section: Hot Key definitions\n")
+	filesize = parseIntDword(hexdata, 52)
+	filesizestring = "\n+4 Least significant 32 bits of the link target file size\n" if filesize > 0xFFFFFFFF else f"\n+4 File size of the link target ({filesize} bytes)\n"
+
+	lnkmarkers.append(filesizestring)
+
+	iconindex = parseIntDword(hexdata, 56)
+	lnkmarkers.append(f"\n+4 Icon index value ({iconindex})\n")
+
+	showcommand = parseIntDword(hexdata, 60)
+	if showcommand == 3:
+		showcommandstring = "The application is open, and keyboard focus is given to the application, but its window is not shown"
+	elif showcommand == 5:
+		showcommandstring = "The application is open, but its window is not shown. It is not given the keyboard focus"
+	else:
+		showcommandstring = "The application is open and its window is open in a normal fashion"
+	lnkmarkers.append(f"\n+4 Expected window state of application launched by the link\n{showcommandstring}\n")
+
+	hotkeylowbyte = parseIntByte(hexdata, 64)
+	hotkeyhighbyte = parseIntByte(hexdata, 65)
+	hotkeylowstring = lowbyte[hotkeylowbyte] if hotkeylowbyte else ""
+	hotkeyhighstring = " + ".join(highbyte[key] for key in highkeyorder if hotkeyhighbyte & key) if hotkeyhighbyte else ""
+	hotkey = " + ".join(filter(None, [hotkeyhighstring, hotkeylowstring]))
+	if not hotkey:
+		hotkey =  "Not assigned!"
+	lnkmarkers.append(f"\n+2 Hot key ({hotkey})\n")
+
 	lnkmarkers.append("\n+2 Unknown (Reserved)\n")
 	lnkmarkers.append("\n+4 Unknown (Reserved)\n")
 	lnkmarkers.append("\n+4 Unknown (Reserved)\n")
@@ -251,21 +273,20 @@ def lnkTemplate(file_path):
 			parsedcommonnetworkrelativelinksize = parseIntDword(hexdata, commonnetworkrelativelinkoffset)
 			lnkmarkers.append(f"\n    +4 CommonNetworkRelativeLinkSize (>= 20): {parsedcommonnetworkrelativelinksize}\n")
 			
-			commonnetworkrelativelinkflags = format(parseIntDword(hexdata, commonnetworkrelativelinkoffset + 4), 'b').zfill(32)
-			ValidDevice = int(commonnetworkrelativelinkflags[31]); ValidNetType = int(commonnetworkrelativelinkflags[30])
-			commonnetworkrelativelinkflag_vars = {"ValidDevice": ValidDevice,	"ValidNetType": ValidNetType}
-			commonnetworkrelativelinkflagsset = "\n         ".join(name for name, value in commonnetworkrelativelinkflag_vars.items() if value == 1)
+			commonnetworkrelativelinkflagsbitstring = format(parseIntDword(hexdata, commonnetworkrelativelinkoffset + 4), '032b')
+			commonnetworkrelativelinkflags = getCommonNetworkRelativeLinkFlags(commonnetworkrelativelinkflagsbitstring)
+			commonnetworkrelativelinkflagsset = "\n         ".join(name for name, value in commonnetworkrelativelinkflags.items() if value == 1)
 			lnkmarkers.append(f"\n        +4 CommonNetworkRelativeLinkFlags\n            SET: {commonnetworkrelativelinkflagsset}\n")
 
 			netnameoffset = parseIntDword(hexdata, commonnetworkrelativelinkoffset + 8)
 			lnkmarkers.append("\n        +4 Offset to the net name\n           Relative to the CommonNetworkRelativeLink struct\n")
 			
-			if ValidDevice:
+			if commonnetworkrelativelinkflags['ValidDevice']:
 				lnkmarkers.append("\n        +4 Offset to the device name\n           Relative to the CommonNetworkRelativeLink struct")
 			else:
 				lnkmarkers.append("\n        +4 Offset to the device name\n           0x00000000 as the flag ValidDevice is not set\n")
 
-			if ValidNetType:
+			if commonnetworkrelativelinkflags['ValidNetType']:
 				networkprovidertype = parseIntDword(hexdata, commonnetworkrelativelinkoffset + 16)
 				lnkmarkers.append(f"\n        +4 Network provider type ({getNetVendor(networkprovidertype)})\n")
 			else:
@@ -277,7 +298,7 @@ def lnkTemplate(file_path):
 				lnkmarkers.append("\n        +4 Offset to the net name in unicode\n           Relative to the CommonNetworkRelativeLink struct")
 
 				linkinfo.append([sum(linkinfo[-1]), 4]); linkinfosize += 4
-				if ValidDevice:
+				if commonnetworkrelativelinkflags['ValidDevice']:
 					lnkmarkers.append("\n        +4 Offset to the device name in unicode\n           Relative to the CommonNetworkRelativeLink struct")
 				else:
 					lnkmarkers.append("\n        +4 Offset to the device name in unicode\n           0x00000000 as the flag ValidDevice is not set\n")
@@ -288,7 +309,7 @@ def lnkTemplate(file_path):
 			linkinfo.append([sum(linkinfo[-1]), netnamesize]); linkinfosize += netnamesize
 			lnkmarkers.append(f"\n        +{netnamesize} Net name (null-terminated)\n")
 
-			if ValidDevice: ##########################
+			if commonnetworkrelativelinkflags['ValidDevice']: ##########################
 				devicenamesize = getNullTerminatedStringSize("".join(hexdata[seek + netnamesize:]))
 				linkinfo.append([sum(linkinfo[-1]), devicenamesize]); linkinfosize += devicenamesize
 				lnkmarkers.append(f"\n        +{devicenamesize} Device name (null-terminated)\n")
@@ -299,7 +320,7 @@ def lnkTemplate(file_path):
 				linkinfo.append([sum(linkinfo[-1]), netnameunicodesize]); linkinfosize += netnameunicodesize
 				lnkmarkers.append(f"\n        +{netnameunicodesize} Net name in unicode (null-terminated)\n")
 
-				if ValidDevice: ##########################
+				if commonnetworkrelativelinkflags['ValidDevice']: ##########################
 					seek = fileheadersize + linktargetidlistsize + linkinfosize
 					devicenameunicodesize = getNullTerminatedUnicodeStringSize("".join(hexdata[seek:]))
 					linkinfo.append([sum(linkinfo[-1]), devicenameunicodesize]); linkinfosize += devicenameunicodesize
