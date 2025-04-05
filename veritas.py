@@ -7,11 +7,7 @@ from kivy.uix.widget import Widget
 from kivy.properties import ObjectProperty
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
-from kivy.resources import resource_add_path, resource_find
-
-from kivy.core.window import Window
-from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelItem
-
+from kivy.resources import resource_add_path
 
 class MyWidget(Widget):
 	firstrv = ObjectProperty(None)

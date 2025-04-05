@@ -1,15 +1,12 @@
 import os, sys
 from kivy.config import Config
 Config.set('graphics', 'window_state', 'maximized')
-
 from kivy.app import App
 from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelItem
 from kivy.core.window import Window
 from kivy.resources import resource_add_path
 from kivy.clock import Clock
-
-import loader
-from veritas import MyWidget  # Your existing code, move to separate file
+from veritas import MyWidget
 
 class MainPanel(TabbedPanel):
 	def __init__(self, **kwargs):
@@ -88,15 +85,12 @@ class MainPanel(TabbedPanel):
 	def switch_tab(self, direction):
 		if not self.my_tabs:
 			return
-
 		try:
 			index = self.my_tabs.index(self.current_tab)
 		except ValueError:
 			return
-
 		new_index = (index + direction) % len(self.my_tabs)
 		self.switch_to(self.my_tabs[new_index])
-
 
 	def add_new_tab(self, file_path=None, prompt_open=True):
 		if file_path:
@@ -109,7 +103,7 @@ class MainPanel(TabbedPanel):
 		viewer._parent_tab = tab
 		tab.content = viewer
 		self.add_widget(tab)
-		self.my_tabs.append(tab)  # Track manually
+		self.my_tabs.append(tab)
 
 		def after_switch(_):
 			self.switch_to(tab)
@@ -125,30 +119,20 @@ class MainPanel(TabbedPanel):
 		if current_viewer and hasattr(current_viewer, 'closeFile'):
 			current_viewer.closeFile()
 
-		current_viewer.ids.closefile.disabled = True
-		current_viewer.ids.closefile.opacity = 0
-
-		current_viewer.ids.openfile.disabled = False
-		current_viewer.ids.openfile.opacity = 1
-
 		tab_to_close = self.current_tab
 		if not tab_to_close:
 			return
-
 		try:
 			index = self.my_tabs.index(tab_to_close)
 		except ValueError:
 			return
-
 		# Remove from panel and our custom list
 		self.remove_widget(tab_to_close)
 		self.my_tabs.remove(tab_to_close)
-
-		# If there are no tabs left, do nothing
+		# If there are no tabs left
 		if not self.my_tabs:
 			self.add_new_tab(prompt_open=False)
 			return
-
 		# Switch to tab on right if available, else go left
 		if index < len(self.my_tabs):
 			self.switch_to(self.my_tabs[index])  # tab on right
