@@ -1,4 +1,6 @@
-import os, sys, binascii, webbrowser, loader
+import os, sys, webbrowser, loader
+from kivy.config import Config
+Config.set('graphics', 'window_state', 'maximized')
 from plyer import filechooser
 from kivy.app import App
 from kivy.uix.widget import Widget
@@ -6,8 +8,10 @@ from kivy.properties import ObjectProperty
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
 from kivy.resources import resource_add_path, resource_find
-from kivy.config import Config
-Config.set('graphics', 'window_state', 'maximized')
+
+from kivy.core.window import Window
+from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelItem
+
 
 class MyWidget(Widget):
 	firstrv = ObjectProperty(None)
@@ -18,15 +22,26 @@ class MyWidget(Widget):
 		self.ids.offsetheader.disabled = True
 		self.ids.offsetheader.opacity = 0
 
-	def openFile(self):
+	def chooseFile(self):
 		file_path = filechooser.open_file(multiple=False, filters=[["All files", "*.lnk", "*"]])
 		if file_path:
 			print(f"Selected file: {file_path[0]}")  # Debugging
-			bytecount = os.path.getsize(file_path[0])
-			loader.loadFile(file_path[0], bytecount, self.updateRecycleViews)
+			return file_path[0]
+		return None
+
+	def openFile(self, file_path):
+		print(f"Selected file: {file_path}")  # Debugging
+		bytecount = os.path.getsize(file_path)
+		loader.loadFile(file_path, bytecount, self.updateRecycleViews)
 
 	def updateRecycleViews(self, first_data, second_data, artifactsupported, file_path):
 		if artifactsupported:
+			self.current_filepath = file_path
+			if hasattr(self, '_parent_tab'):
+				filename = os.path.basename(file_path)
+				short_name = (filename[:10] + '...') if len(filename) > 10 else filename
+				self._parent_tab.text = short_name
+
 			app = App.get_running_app()
 			app.title = f"Veritas - [{file_path}]"
 
@@ -60,8 +75,14 @@ class MyWidget(Widget):
 			popup.open()
 
 	def closeFile(self):
+		print("File actually closed")
 		app = App.get_running_app()
 		app.title = "Veritas"
+		self.current_filepath = ""
+
+		if hasattr(self, '_parent_tab'):
+			self._parent_tab.text = "New Tab"
+
 		self.ids.firstrv.data = []
 		self.ids.secondrv.data = []
 

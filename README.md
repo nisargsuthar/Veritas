@@ -43,6 +43,8 @@ For issues/discussions regarding the project, kindly join the [Digital Forensics
 ## Features
 * Dynamic artifact templates.
 * Color coded artifact file structure with sub-sections.
+* Load multiple files simultaneously in tabs with standard keybinds.
+* Drag-n-drop artifacts into Veritas with deduplication.
 
 ## Supported Artifacts
 | NTOS                        | Images          | Documents       | Databases                |
@@ -79,6 +81,18 @@ python.exe -m pip install "kivy[base]"
 ```python
 python.exe -m pip install plyer
 ```
+
+## Usage
+```python
+python.exe main.py
+```
+
+|  Shortcut |   Description   |
+|-----------|-----------------|
+|Ctrl + O   | Open a file     |
+|Ctrl + W   | Close a file    |
+|Ctrl + PgUp| Cycle tabs left |
+|Ctrl + PgDn| Cycle tabs right|
 
 ## Special Thanks (Check [RESOURCES.md](https://github.com/nisargsuthar/Veritas/blob/main/RESOURCES.md) for more)
 [Andrew Rathbun](https://twitter.com/bunsofwrath12), [el3phanten](https://github.com/el3), [Gary Kessler](https://www.linkedin.com/in/garykessler), [Joachim Metz](https://github.com/joachimmetz), [Forensics Wiki](https://forensics.wiki/)
