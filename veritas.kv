@@ -16,6 +16,16 @@
     font_name: "RobotoMono-Regular"
     markup: True
     padding: 20, 0
+    index: 0
+    highlight: False
+    canvas.before:
+        Color:
+            rgba: (1, 0, 0, 1) if self.highlight else (0, 0, 0, 0)
+        Line:
+            width: 1.5
+            rectangle: self.x, self.y, self.width, self.height
+    on_touch_down:
+        if self.collide_point(*args[1].pos): app.root.current_tab.content.handle_marker_click(self.index)
 
 <HexAsciiViewClass@GridLayout>:
     offsettext: ""
@@ -24,6 +34,13 @@
     cols: 3
     height: self.minimum_height
     size_hint_y: None
+    highlight: False
+    canvas.before:
+        Color:
+            rgba: (1, 0, 0, 1) if self.highlight else (0, 0, 0, 0)
+        Line:
+            width: 1.5
+            rectangle: self.x, self.y, self.width, self.height
     HexAsciiLabel:
         text: root.offsettext
         width: 72+20+20

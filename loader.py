@@ -43,12 +43,20 @@ def loadFile(file_path, bytecount, callback):
 		savecolor = []
 		# Making an infinite iterator for color_dict so in case templatedata requires more colors than present in the dictionary, it can loop through it indefinitely.
 		color_cycle = itertools.cycle(color_dict.keys())
+
+		byte_ranges = []
+
 		# templatedata list is reversed to avoid the template offsets being changed after injection of color tags. Instead of computing new offsets and reduce performance, tag injection is done in reverse to maintain original offsets.
 		for pair in reversed(templatedata):
+			# Storing start and end byte locations for each markers to facilitate row highlights.
+			start_byte = pair[0] - 1
+			length = pair[1] + 1
+			end_byte = start_byte + length
+			byte_ranges.insert(0, (start_byte, end_byte))  # insert at 0 to reverse match marker order
 			color = next(color_cycle)
 			# Injecting the [color=XXXXXX] & [/color] Kivy tags around the template section. 
-			hexdata = colorBytes(hexdata, color_dict[color], pair[0] - 1, pair[1] + 1)
-			asciidata = colorBytes(asciidata, color_dict[color], pair[0] - 1, pair[1] + 1)
+			hexdata = colorBytes(hexdata, color_dict[color], start_byte, length)
+			asciidata = colorBytes(asciidata, color_dict[color], start_byte, length)
 			# Save the color order for processing markerdata later.
 			savecolor.append(color)
 			# Remove the last section for which color tags were just injected.
@@ -93,7 +101,8 @@ def loadFile(file_path, bytecount, callback):
 			first.append(joinOffsetHexAscii(o, h, a))
 		# Again leveraging Kivy not minding missing closing color tags, markerdata is split on it.
 		second = [{"text": f"{line}"} for line in markerdata.split("[/color]")]
-		callback(first, second, artifactsupported, file_path)
+		callback(first, second, artifactsupported, file_path, byte_ranges)
+
 #######################################################################################################
 
 def isPrefetch(hexdata):

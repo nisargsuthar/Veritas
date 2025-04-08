@@ -30,15 +30,15 @@ class MainPanel(TabbedPanel):
 
 	def open_file_from_widget(self, widget):
 		file_path = widget.chooseFile()
-		if file_path:
-			existing_tab = self.get_tab_by_filepath(file_path)
-			if existing_tab:
-				self.switch_to(existing_tab)
-			elif not getattr(widget, 'current_filepath', None):
-				widget.openFile(file_path)
-			else:
-				self.add_new_tab(file_path=file_path)
-
+		for path in file_path:
+			if path:
+				existing_tab = self.get_tab_by_filepath(path)
+				if existing_tab:
+					self.switch_to(existing_tab)
+				elif not getattr(widget, 'current_filepath', None):
+					widget.openFile(path)
+				else:
+					self.add_new_tab(file_path=path)
 
 	def _on_tab_switched(self, instance, tab):
 		app = App.get_running_app()
@@ -66,15 +66,16 @@ class MainPanel(TabbedPanel):
 		if 'ctrl' in modifiers:
 			if key == ord('o'):
 				current_viewer = getattr(self.current_tab, 'content', None)
-				selected_file = current_viewer.chooseFile() if current_viewer else None
-				if selected_file:
-					existing_tab = self.get_tab_by_filepath(selected_file)
-					if existing_tab:
-						self.switch_to(existing_tab)
-					elif current_viewer and not getattr(current_viewer, 'current_filepath', None):
-						current_viewer.openFile(selected_file)
-					else:
-						self.add_new_tab(file_path=selected_file)
+				selected_files = current_viewer.chooseFile() if current_viewer else None
+				for selected_file in selected_files:
+					if selected_file:
+						existing_tab = self.get_tab_by_filepath(selected_file)
+						if existing_tab:
+							self.switch_to(existing_tab)
+						elif current_viewer and not getattr(current_viewer, 'current_filepath', None):
+							current_viewer.openFile(selected_file)
+						else:
+							self.add_new_tab(file_path=selected_file)
 			elif key == ord('w'):
 				self.close_current_tab()
 			elif key == 280:  # Ctrl + PageUp

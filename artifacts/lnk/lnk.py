@@ -142,7 +142,7 @@ def lnkTemplate(file_path):
 				case "URI":
 					str4 = f""
 
-			lnkmarkers.append(shellitemstrings) # Append concatenation here
+			lnkmarkers.append(shellitemstrings)
 			start += size
 		linktargetidlist.append([start, 2]) # TerminalID
 		linktargetidlistsize += 2
