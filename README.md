@@ -65,26 +65,21 @@ For issues/discussions regarding the project, kindly join the [Digital Forensics
 ## Installation
 **Step 1**: Create a virtual environment using:
 ```python
-python.exe -m venv veritas
+python -m venv veritas
 ```
 
 **Step 2**: Depending on your OS, activate the virtual environment using:
 * Windows: `.\veritas\Scripts\activate`
 * Linux: `source veritas/Scripts/activate`
 
-**Step 3**: Install Kivy using:
+**Step 3**: Install dependencies using:
 ```python
-python.exe -m pip install "kivy[base]"
-```
-
-**Step 4**: Install Plyer using:
-```python
-python.exe -m pip install plyer
+pip install -r requirements.txt
 ```
 
 ## Usage
 ```python
-python.exe main.py
+python main.py
 ```
 
 |  Shortcut |   Description   |
