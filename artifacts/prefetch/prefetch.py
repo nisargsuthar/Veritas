@@ -18,7 +18,7 @@ def prefetchTemplate(file_path):
 	###################
 	fileheader = [[1, 4], [5, 4], [9, 4], [13, 4], [17, 60], [77, 4], [81, 4]]
 	fileheadersize = 84
-	prefetchmarkers.append("+4  Format version    \n    17 (0x00000011) > Windows XP, Windows 2003    \n    23 (0x00000017) > Windows Vista, Windows 7    \n    26 (0x0000001A) > Windows 8.1    \n    30 (0x0000001E) > Windows 10\n")
+	prefetchmarkers.append("+4  Format version    \n    17 (0x00000011) > Windows XP, Windows 2003    \n    23 (0x00000017) > Windows Vista, Windows 7    \n    26 (0x0000001A) > Windows 8.1    \n    30 (0x0000001E) > Windows 10\n    31 (0x0000001F) > Windows 11\n")
 	prefetchmarkers.append("\n+4  Signature\n")
 	prefetchmarkers.append("\n+4  Unknown\nSeen: 0x0000000F, 0x00000011\n")
 	prefetchmarkers.append("\n+4  File size\n")
@@ -26,7 +26,7 @@ def prefetchTemplate(file_path):
 	prefetchmarkers.append("\n+4 Prefetch hash\nThis value should correspond with the hash in the Prefetch filename\n")
 	prefetchmarkers.append("\n+4 Unknown (flags?)\n0x01 > is boot prefetch\n(Seen in: NTOSBOOT-B00DFAAD.pf, Op-EXPLORER.EXE-A80E4F97-000000F5.pf)\n")
 
-	prefetchmarkers.append("\n+4 File metrics array offset\n    The offset is relative to the start of the file\n    0x00000098 > Version 17\n    0x000000F0 > Version 23\n    0x00000130 > Version 26\n    0x00000130 > Version 30, Variant 1\n    0x00000128 > Version 30, Variant 2\n")
+	prefetchmarkers.append("\n+4 File metrics array offset\n    The offset is relative to the start of the file\n    0x00000098 > Version 17\n    0x000000F0 > Version 23\n    0x00000130 > Version 26\n    0x00000130 > Version 30, Variant 1\n    0x00000128 > Version 30, Variant 2 OR Version 31\n")
 	prefetchmarkers.append("\n+4 Number of file metrics entries\n")
 	prefetchmarkers.append("\n+4 Trace chains array offset\nThe offset is relative to the start of the file\n")
 	prefetchmarkers.append("\n+4 Number of trace chains array entries\n")
@@ -108,8 +108,8 @@ def prefetchTemplate(file_path):
 			tracechains = [[1, tracechainssize]]
 			prefetchmarkers.append(f"\n+{tracechainssize} Trace chains array [{numberoftracechainsentries} entries]\n{sharedTraceChainsByVer172326}")
 
-		case "1E000000":
-			# Was 10 or 11 > PFV 30
+		case "1E000000" | "1F000000":
+			# Was 10 or 11 > PFV 30 or 31
 			variant = "".join(hexdata[b] for b in range(84, 88))
 			prefetchmarkers.append("\n+8 Unknown (Empty values)\n")
 			prefetchmarkers.append("\n+64 (8 * 8) Last run time(s)\nContains FILETIMEs, or 0 if not set\nThe first FILETIME is the most recent run time\n")
